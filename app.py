@@ -28,8 +28,8 @@ app = Flask(__name__)
 # from api.visits import visits_bp
 # app.register_blueprint(visits_bp, url_prefix="/api/visits")
 
-# from api.labs import labs_bp
-# app.register_blueprint(labs_bp, url_prefix="/api/labs")
+# from api.biometrics import biometrics_bp
+# app.register_blueprint(biometrics_bp, url_prefix="/api/biometrics")
 
 # from api.grooming import grooming_bp
 # app.register_blueprint(grooming_bp, url_prefix="/api/grooming")
