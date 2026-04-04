@@ -46,6 +46,9 @@ app = Flask(__name__)
 # from api.locations import locations_bp
 # app.register_blueprint(locations_bp, url_prefix="/api/locations")
 
+# from api.users import users_bp
+# app.register_blueprint(users_bp, url_prefix="/api/users")
+
 # ---------------------------------------------------------------------------
 # Routes
 # ---------------------------------------------------------------------------
