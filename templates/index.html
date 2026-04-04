@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vet Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
+</head>
+<body>
+
+  <header>
+    <h1>Veterinary Patient Dashboard</h1>
+    <!-- TODO: nav, search bar, clinic name/logo -->
+  </header>
+
+  <main>
+
+    <!-- ------------------------------------------------------------------  -->
+    <!-- TODO: Patient list panel (sidebar or table)                         -->
+    <!-- ------------------------------------------------------------------  -->
+    <section id="patient-list">
+      <p>Patient list goes here.</p>
+    </section>
+
+    <!-- ------------------------------------------------------------------  -->
+    <!-- TODO: Patient detail panel                                          -->
+    <!--   - Basic info (name, species, breed, age, weight, sex)             -->
+    <!--   - Owner contact info                                              -->
+    <!--   - Active medications & allergies                                  -->
+    <!--   - Vitals summary                                                  -->
+    <!--   - Visit history timeline                                          -->
+    <!--   - Lab results & imaging                                           -->
+    <!--   - Vaccine records                                                 -->
+    <!--   - Gamified feature                                                -->
+
+    <!-- ------------------------------------------------------------------ -->
+    <section id="patient-detail">
+      <p>Select a patient to view their record.</p>
+    </section>
+
+  </main>
+
+  <footer>
+    <!-- TODO: footer content -->
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
