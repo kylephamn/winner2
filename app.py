@@ -16,8 +16,8 @@ app = Flask(__name__)
 # ---------------------------------------------------------------------------
 # Uncomment each import and registration as the blueprint is implemented.
 
-# from api.patients import patients_bp
-# app.register_blueprint(patients_bp, url_prefix="/api/patients")
+from api.patients import patients_bp
+app.register_blueprint(patients_bp, url_prefix="/api/patients")
 
 # from api.notes import notes_bp
 # app.register_blueprint(notes_bp, url_prefix="/api/notes")
