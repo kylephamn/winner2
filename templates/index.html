@@ -8,42 +8,228 @@
 </head>
 <body>
 
+  <!-- ================================================================== -->
+  <!-- Header                                                               -->
+  <!-- ================================================================== -->
   <header>
     <h1>Veterinary Patient Dashboard</h1>
-    <!-- TODO: nav, search bar, clinic name/logo -->
+
+    <div class="header-actions">
+      <!-- TODO: "Find Emergency Care" button (locations.js)
+           - Always visible regardless of which patient is selected
+           - Style: red or urgent-gold — visually distinct from all other nav elements
+           - On click: openLocationFinder("emergency")
+           - Opens location finder modal in emergency mode (red accent, large phone numbers)
+           - Include a small urgency icon (e.g. cross or location pin)
+      -->
+
+      <!-- TODO: Global telehealth button
+           - Opens the 6-step telehealth consult flow (telehealth.js)
+           - Pre-fills patient if one is currently selected
+           - Style with .btn-gold for warmth / approachability
+           - Include a small video icon to the left of the label
+      -->
+
+      <!-- TODO: Vaccine reminder notification bell
+           - Displays a red count badge when any patient has overdue vaccines
+           - On click, opens a dropdown listing affected patients + vaccine names
+           - Dropdown links navigate to the patient's detail panel
+           - Rendered and managed by vaccines.js
+      -->
+    </div>
   </header>
 
   <main>
 
-    <!-- ------------------------------------------------------------------  -->
-    <!-- TODO: Patient list panel (sidebar or table)                         -->
-    <!-- ------------------------------------------------------------------  -->
+    <!-- ================================================================ -->
+    <!-- Sidebar — Patient list                                            -->
+    <!-- ================================================================ -->
     <section id="patient-list">
-      <p>Patient list goes here.</p>
+      <!-- TODO: Render patient cards here (patients.js)
+           Each card (.patient-item) should include:
+           - Patient name (.patient-name)
+           - Species + breed + age (.patient-meta)
+           - Risk flag icon (if patient has any active risk_tags) — red icon
+             with tooltip on hover listing all active tags (notes.js)
+           - Vaccine status dot — color matches worst bucket across all vaccines:
+               red = overdue, orange = due-soon, gold = upcoming, none = current
+           On mouseenter: prefetchOnHover(patient.id) — background fetch
+           On click: loadPatientDetail(patient.id) — read cache or fetch
+      -->
+      <p>Loading patients&hellip;</p>
     </section>
 
-    <!-- ------------------------------------------------------------------  -->
-    <!-- TODO: Patient detail panel                                          -->
-    <!--   - Basic info (name, species, breed, age, weight, sex)             -->
-    <!--   - Owner contact info                                              -->
-    <!--   - Active medications & allergies                                  -->
-    <!--   - Vitals summary                                                  -->
-    <!--   - Visit history timeline                                          -->
-    <!--   - Lab results & imaging                                           -->
-    <!--   - Vaccine records                                                 -->
-    <!--   - Gamified feature                                                -->
-
-    <!-- ------------------------------------------------------------------ -->
+    <!-- ================================================================ -->
+    <!-- Main panel — Patient detail                                        -->
+    <!-- ================================================================ -->
     <section id="patient-detail">
-      <p>Select a patient to view their record.</p>
+
+      <!-- 1. Behavioral risk flags -->
+      <!-- TODO: Render risk flag chips (notes.js)
+           - Show above all other content — safety-critical information
+           - Red chips for aggression/bite flags, amber for anxiety flags
+           - Each chip has a × to remove the tag
+           - "Add flag" button opens tag selector
+           - Hide this section entirely if patient has no risk_tags
+      -->
+      <div id="risk-flags"></div>
+
+      <!-- 2. Basic patient info -->
+      <!-- TODO: Render patient info card (patients.js)
+           Fields: name, species, breed, age, weight, sex, owner name, owner contact
+      -->
+      <div id="patient-info"></div>
+
+      <!-- 3. Active medications + allergies -->
+      <!-- TODO: Render medications and allergies card (patients.js)
+           - List active medications with dose and frequency
+           - List known allergies highlighted in amber
+           - Show "None on record" gracefully if empty
+      -->
+      <div id="meds-allergies"></div>
+
+      <!-- 4. Vaccine status card -->
+      <!-- TODO: Render vaccine card (vaccines.js)
+           - List each vaccine with last administered date, next due date
+           - Colored status badge per vaccine (red/orange/gold/green)
+           - Group: overdue first, then due-soon, upcoming, current
+      -->
+      <div id="vaccine-card"></div>
+
+      <!-- 5. Vitals summary -->
+      <!-- TODO: Render vitals card (patients.js)
+           Fields: heart rate, temperature, blood pressure, respiratory rate, weight
+           Show most recent recorded values with date of measurement
+      -->
+      <div id="vitals"></div>
+
+      <!-- 6. Visit history timeline -->
+      <!-- TODO: Render visit timeline (visits.js)
+           - Chronological, newest first
+           - Each entry: date, attending vet, reason, brief notes
+           - "Log new visit" button — surfaces risk flag reminder before form
+           - "Find Nearby Vet" link (soft, non-emergency styling)
+             → openLocationFinder("standard") — for referrals and after-hours planning
+      -->
+      <div id="visit-history"></div>
+
+      <!-- 7. Labs + grooming -->
+      <!-- TODO: Render labs section (patients.js / labs.js)
+           - Table of lab results: date, test name, result, reference range
+           - Flag out-of-range values
+      -->
+      <!-- TODO: Render grooming section (patients.js / grooming.js)
+           - Last groomed date, coat condition notes, next grooming appointment
+      -->
+      <div id="labs-grooming"></div>
+
+      <!-- 8. Gamification progress widget -->
+      <!-- TODO: Render gamification widget (gamification.js)
+           - Points total + progress bar toward next milestone (gold fill)
+           - Badge shelf: earned badges full color, locked badges grayscale
+           - Next milestone label below bar
+           - Warm, celebratory tone — avoid clinical language
+      -->
+      <div id="gamification"></div>
+
     </section>
 
   </main>
 
+  <!-- ==================================================================== -->
+  <!-- Location finder modal                                                  -->
+  <!--                                                                        -->
+  <!-- Standalone — does not require a patient to be selected.               -->
+  <!-- Opened via openLocationFinder(mode) in locations.js.                 -->
+  <!--                                                                        -->
+  <!-- TODO: #location-finder-modal                                           -->
+  <!--   - Full screen on mobile, large centered modal on desktop             -->
+  <!--   - In "emergency" mode: add .emergency-mode class for red accent UI   -->
+  <!--   - In "standard" mode: standard CSU green/gold styling                -->
+  <!--   - Close button (×) top-right, dismisses and clears state             -->
+  <!--                                                                        -->
+  <!-- TODO: Filter bar (hidden in emergency mode)                            -->
+  <!--   - Toggle: "Emergency only" — hides general clinics                   -->
+  <!--   - Toggle: "Open now" — filters to currently open locations           -->
+  <!--   - Specialty dropdown: General / Emergency / Oncology / Cardiology /  -->
+  <!--     Dermatology / Neurology / Ophthalmology / Exotic & Avian           -->
+  <!--   - onChange: applyFilters(filters) — client-side, no new fetch        -->
+  <!--                                                                        -->
+  <!-- TODO: Map container (#map-container)                                   -->
+  <!--   - Renders embedded map with colored pins (red = ER, green = general) -->
+  <!--   - Blue dot for user's current location                               -->
+  <!--   - On mobile: collapsed by default; toggled by "Show map" button      -->
+  <!--   - On desktop: visible alongside results list                         -->
+  <!--                                                                        -->
+  <!-- TODO: Results list (#location-results)                                 -->
+  <!--   - Two sections: "Emergency / 24-Hour Care" then "General Clinics"    -->
+  <!--   - Each card: name, distance, address, phone (tap-to-call), hours,    -->
+  <!--     "Get Directions" button, specialty badge(s)                        -->
+  <!-- ==================================================================== -->
+  <div id="location-finder-modal" aria-hidden="true">
+    <!-- TODO: Emergency disclaimer banner (visible only in emergency mode)
+         Text: "For life-threatening emergencies, call your nearest 24-hour animal hospital directly."
+         Style: red background, white bold text, full width, top of modal
+    -->
+
+    <!-- TODO: Location input / geolocation status
+         - On open: auto-request geolocation (requestGeolocation())
+         - If denied: show ZIP / city text input with a "Search" button
+         - Show "Using your current location" or "Searching near [ZIP]..." status
+    -->
+
+    <!-- TODO: Filter bar (locations.js applyFilters) — hide in emergency mode -->
+    <div id="location-filter-bar"></div>
+
+    <!-- TODO: Map container (locations.js renderMap) -->
+    <div id="map-container"></div>
+
+    <!-- TODO: Results list (locations.js renderResultsList) -->
+    <div id="location-results"></div>
+  </div>
+
+  <!-- ==================================================================== -->
+  <!-- Loading overlay                                                        -->
+  <!--                                                                        -->
+  <!-- Behavior:                                                              -->
+  <!--   - Minimum display time: 800ms (enforced in ui.js showLoading)        -->
+  <!--   - Fun fact card is centered over the overlay while loading           -->
+  <!--   - Shimmer animation runs behind the fact card on content skeleton    -->
+  <!--   - Overlay fades out smoothly on dismiss (CSS transition)             -->
+  <!--   - If the active patient has overdue vaccines, surface a soft         -->
+  <!--     reminder below the fun fact: "Heads up — [pet] has overdue vaccines" -->
+  <!-- ==================================================================== -->
+  <div id="loading-overlay" aria-hidden="true">
+    <!-- TODO: Fun fact card
+         - Fetch from GET /api/facts/ each time overlay is shown (gamification.js)
+         - Display "Did you know..." heading + fact text
+         - Centered vertically and horizontally over the overlay
+    -->
+    <div class="fact-card"></div>
+
+    <!-- TODO: Shimmer skeleton placeholders
+         - Render behind the fact card to indicate content is loading
+         - Match the approximate shape of the patient detail layout
+         - Shimmer animation defined in main.css
+    -->
+    <div class="skeleton-content"></div>
+  </div>
+
   <footer>
-    <!-- TODO: footer content -->
+    <!-- TODO: Footer content
+         - Clinic name or logo (left-aligned)
+         - Version number or "Powered by CSU Vet" note (right-aligned)
+    -->
   </footer>
 
-  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/ui.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/patients.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/notes.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/vaccines.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/visits.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/telehealth.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/gamification.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/locations.js') }}"></script>
+
 </body>
 </html>

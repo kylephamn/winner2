@@ -304,3 +304,150 @@ footer {
   color: var(--csu-mid);
   flex-shrink: 0;
 }
+
+/* ============================================================
+   TODO: Loading overlay + shimmer animation
+   ============================================================
+   - #loading-overlay: full-screen fixed overlay, semi-transparent cream bg
+   - .fact-card: centered white card with soft shadow, fact text + "Did you know" label
+   - Fade-out transition on dismiss (opacity 0 → pointer-events none)
+   - @keyframes shimmer: sweeping highlight left → right (135deg gradient)
+   ============================================================ */
+
+/* ============================================================
+   TODO: Skeleton / shimmer placeholder styles
+   ============================================================
+   - .skeleton: base class — light gray bg, border-radius matching card shapes
+   - .skeleton-text: slim horizontal bar (~14px tall) for text lines
+   - .skeleton-card: full card-height placeholder block
+   - .skeleton-content: wrapper that stacks skeleton items in the detail panel layout
+   - Apply .shimmer class to animate — uses shimmer keyframes above
+   ============================================================ */
+
+/* ============================================================
+   TODO: Risk flag chip styles
+   ============================================================
+   - .risk-chip: pill shape, small font, icon + label + × button
+   - .risk-chip--red:   background tint of red, red text — for aggression / bite flags
+   - .risk-chip--amber: background tint of amber, amber text — for anxiety flags
+   - .risk-chip .remove-btn: × button, subtle, visible on hover
+   - #risk-flags: flex-wrap row, gap between chips, margin-bottom before next section
+   ============================================================ */
+
+/* ============================================================
+   TODO: Vaccine status badge styles
+   ============================================================
+   - Extend existing .badge with status variants:
+   - .badge-overdue:   red background + text (danger — past due)
+   - .badge-due-soon:  orange background + text (warning — within 7 days)
+   - .badge-upcoming:  gold background + text (notice — within 30 days)
+   - .badge-current:   green (existing .badge-green) — more than 30 days out
+   - .vaccine-dot: tiny 8px circle used in sidebar patient cards
+     .vaccine-dot--red / --orange / --gold / --green
+   ============================================================ */
+
+/* ============================================================
+   TODO: Notification bell + dropdown styles
+   ============================================================
+   - .notif-bell: button wrapper, position relative, no background
+   - .notif-badge: absolute positioned red circle with white count text
+     top-right of the bell icon; hidden when count is 0
+   - .notif-dropdown: absolute positioned card below bell, min-width 300px
+     shadow-md, hidden by default, shown on bell click
+   - .notif-row: each patient/vaccine row in dropdown — flex, hover bg
+   - .notif-dropdown--empty: muted "All vaccines up to date" message
+   ============================================================ */
+
+/* ============================================================
+   TODO: Telehealth flow styles
+   ============================================================
+   - Telehealth uses a warmer, softer palette: lean cream and gold over green
+   - .telehealth-modal / .telehealth-panel: overlay or side panel container
+   - .telehealth-step: each step wrapper with fade-in transition between steps
+   - .urgency-selector: radio-style pill buttons with friendly labels
+     low → green-tinted, medium → gold-tinted, high → orange-tinted, critical → red
+   - .consult-room: two-column layout (video placeholder | patient sidebar)
+   - .consult-video-placeholder: gray box, camera icon, soft border
+   - .post-consult-summary: warm card with vet name, notes, follow-up CTA
+   ============================================================ */
+
+/* ============================================================
+   TODO: Gamification progress bar + badge shelf styles
+   ============================================================
+   - .gamification-widget: card wrapper for the full progress section
+   - .progress-bar-track: full-width gray track, border-radius pill
+   - .progress-bar-fill: gold fill, width set via inline style (% of milestone)
+     transition: width 0.4s ease for animated fill on load
+   - .badge-shelf: flex row, gap, overflow-x auto for many badges
+   - .badge-item: 40×40px circle, icon centered
+     .badge-item--earned: full color
+     .badge-item--locked: grayscale + reduced opacity
+   - .milestone-label: small muted text below bar — "Next: Senior Wellness Champion"
+   ============================================================ */
+
+/* ============================================================
+   TODO: Emergency mode color overrides
+   ============================================================
+   - .emergency-mode: applied to #location-finder-modal when opened via header button
+   - Override accent colors: --emergency-red: #C0392B (or similar deep red)
+   - .emergency-mode .modal-header: red background instead of CSU green
+   - .emergency-mode .result-card--er: stronger red left border, elevated shadow
+   - .emergency-mode .phone-number: font-size 20px+, font-weight 700, tap-to-call
+   - .emergency-disclaimer: full-width red banner, white text, bold, top of modal
+   ============================================================ */
+
+/* ============================================================
+   TODO: Location result card styles
+   ============================================================
+   - .result-card: white card, border-radius md, shadow-sm, padding 16px
+     left border 4px solid — red for ER, green for general clinic
+   - .result-card__name: bold, 15px
+   - .result-card__distance: muted, small — e.g. "1.2 mi"
+   - .result-card__address: standard body text
+   - .result-card__phone: tap-to-call <a href="tel:"> styling
+     Normal mode: standard link style
+     Emergency mode: large (20px+), bold, prominent
+   - .result-card__hours: colored by status:
+       "Open now" → green text
+       "Closes at Xpm" → gold/amber text
+       "24 Hours" → green text + badge
+       "Closed" → red text
+   - .result-card__directions: .btn-secondary style, "Get Directions" label
+   - .specialty-badge: small pill badge for specialist type (Oncology, etc.)
+     style similar to existing .badge but with a distinct outline variant
+   - .result-section-header: section label ("Emergency / 24-Hour Care",
+     "General Veterinary Clinics") — bold, slightly larger, with a divider line
+   ============================================================ */
+
+/* ============================================================
+   TODO: Map container styles
+   ============================================================
+   - #map-container: defined height (e.g. 300px desktop, 220px mobile)
+     border-radius md, overflow hidden, border 1px solid var(--csu-border)
+   - Mobile: hidden by default; shown when .map-visible class is applied
+     Toggle via "Show map" / "Hide map" button below filter bar
+   - Desktop: displayed alongside results list in a two-column layout
+   ============================================================ */
+
+/* ============================================================
+   TODO: Filter bar styles
+   ============================================================
+   - #location-filter-bar: flex row, gap 8px, padding 12px 0, flex-wrap
+   - .filter-toggle: pill-shaped toggle button
+     inactive: white bg, border, muted text
+     active: CSU green bg, white text
+   - .filter-toggle--emergency: active state uses red instead of green
+   - .specialty-select: styled <select> matching dashboard input conventions
+   - Filter bar is hidden entirely in emergency mode (.emergency-mode)
+   ============================================================ */
+
+/* ============================================================
+   TODO: Mobile tap-to-call button styles
+   ============================================================
+   - .tap-to-call: <a href="tel:..."> styled as a button on mobile
+     min-height 44px (Apple HIG touch target), full width on mobile
+     Icon (phone handset) to the left of the number
+   - Normal mode: .btn-secondary style
+   - Emergency mode: prominent — dark red bg, white text, large font
+   - @media (min-width: 768px): revert to inline link style on desktop
+   ============================================================ */
