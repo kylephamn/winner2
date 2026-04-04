@@ -7,7 +7,7 @@
 #   from api.notes import notes_bp
 #   from api.vaccines import vaccines_bp
 #   from api.visits import visits_bp
-#   from api.labs import labs_bp
+#   from api.biometrics import biometrics_bp
 #   from api.grooming import grooming_bp
 #   from api.telehealth import telehealth_bp
 #   from api.gamification import gamification_bp
