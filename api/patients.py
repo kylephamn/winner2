@@ -1,6 +1,7 @@
 import uuid
 
 from flask import Blueprint, jsonify, request
+from api.schemas import new_pet
 
 patients_bp = Blueprint("patients", __name__)
 
@@ -38,13 +39,25 @@ def get_patient(patient_id):
 
 @patients_bp.route("/", methods=["POST"])
 def create_patient(db):
-    # TODO: validate and persist a new patient record
-    data = request.get_json()
-    patient_id = uuid.uuid4()
-    db.collection("patients").document(patient_id).set(data)
-
-    return jsonify({"petID": patient_id, **data}), 201
-
+    #request.get_json()
+    data = {
+        "name": "Buddy",
+        "species": "Dog",
+        "breed": "Labrador",
+        "sex": "M",
+        "dob": "2020-01-01",
+        "neutered": True,
+        "insurance_id": "INS123",
+        "weight": 65,
+        "vaccine_list": [],
+        "reminders": [],
+        "ui_preference": None,
+    }
+    pet_id = str(uuid.uuid4())
+    pet = new_pet(data)         # enforces the shape
+    pet["petID"] = pet_id
+    db.collection("pets").document(pet_id).set(pet)
+    return jsonify(pet), 201
 
 
 @patients_bp.route("/<int:patient_id>", methods=["PUT"])
@@ -54,6 +67,7 @@ def update_patient(patient_id):
 
 
 @patients_bp.route("/<int:patient_id>", methods=["DELETE"])
-def delete_patient(patient_id):
+def delete_patient(patient_id,db):
     # TODO: soft-delete or hard-delete patient record
-    pass
+    db.collection('Pet').document(patient_id).delete()
+    return "", 204
