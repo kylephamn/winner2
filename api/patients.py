@@ -1,3 +1,5 @@
+import uuid
+
 from flask import Blueprint, jsonify, request
 
 patients_bp = Blueprint("patients", __name__)
@@ -21,6 +23,7 @@ patients_bp = Blueprint("patients", __name__)
 # ---------------------------------------------------------------------------
 
 
+
 @patients_bp.route("/", methods=["GET"])
 def list_patients():
     # TODO: query database and return paginated patient list
@@ -34,9 +37,14 @@ def get_patient(patient_id):
 
 
 @patients_bp.route("/", methods=["POST"])
-def create_patient():
+def create_patient(db):
     # TODO: validate and persist a new patient record
-    pass
+    data = request.get_json()
+    patient_id = uuid.uuid4()
+    db.collection("patients").document(patient_id).set(data)
+
+    return jsonify({"petID": patient_id, **data}), 201
+
 
 
 @patients_bp.route("/<int:patient_id>", methods=["PUT"])
