@@ -1,6 +1,7 @@
 # CATAPULTS Team Code Repository
 <p id="top"></p>
 <br><b><i>I hand picked these emojis this is not AI slop</i></b></br>
+
 This is our team repo for the Hack4Health 2026 Hackathon
 
 <details open="open">
