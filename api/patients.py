@@ -1,7 +1,9 @@
 import uuid
-
+import firebase_admin
+from firebase_admin import credentials, firestore
 from flask import Blueprint, jsonify, request
 from api.schemas import new_pet
+from db import db
 
 patients_bp = Blueprint("patients", __name__)
 
@@ -38,7 +40,7 @@ def get_patient(patient_id):
 
 
 @patients_bp.route("/", methods=["POST"])
-def create_patient(db):
+def create_patient():
     #request.get_json()
     data = {
         "name": "Buddy",
@@ -67,7 +69,7 @@ def update_patient(patient_id):
 
 
 @patients_bp.route("/<int:patient_id>", methods=["DELETE"])
-def delete_patient(patient_id,db):
+def delete_patient(patient_id):
     # TODO: soft-delete or hard-delete patient record
     db.collection('Pet').document(patient_id).delete()
     return "", 204

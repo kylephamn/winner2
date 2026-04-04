@@ -2,6 +2,29 @@
 // patients.js — patient list and detail panel
 // ============================================================
 
+async function createPatient() {
+    const response = await fetch("http://localhost:5000/api/patients/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                name: "Buddy",
+                species: "Dog",
+                breed: "Labrador",
+                sex: "M",
+                dob: "2020-01-01",
+                neutered: true,
+                insurance_id: "INS123",
+                weight: 65
+            })
+        });
+
+    const data = await response.json();
+    console.log(data);
+}
+
+
 // ------------------------------------------------------------
 // TODO: Fetch patient list on page load
 //   - GET /api/patients/

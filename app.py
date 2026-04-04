@@ -1,15 +1,8 @@
-import firebase_admin
-from firebase_admin import credentials, firestore
 from flask import Flask, render_template
-
-cred = credentials.Certificate("firebase-key.json")
-firebase_admin.initialize_app(cred)
-
-
-db = firestore.client()
-
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 # ---------------------------------------------------------------------------
 # Blueprints
