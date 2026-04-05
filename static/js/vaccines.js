@@ -16,6 +16,26 @@
 //   - Group by status: overdue first, then due soon, then upcoming, then current
 // ------------------------------------------------------------
 
+async function readVaccinePaper() {
+    const fileInput = document.getElementById("vaccine-image");
+    const file = fileInput.files[0];
+
+    const reader = new FileReader();
+    reader.onload = async () => {
+        const base64 = reader.result.split(",")[1];  // strip the data:image/... prefix
+
+        const response = await fetch("http://localhost:5000/api/vaccines/", {
+            method: "GET",  // consider POST for sending data
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ image: base64 })
+        });
+
+        const data = await response.json();
+        console.log(data);
+    };
+    reader.readAsDataURL(file);
+}
+
 // ------------------------------------------------------------
 // TODO: Render notification bell with overdue count in header
 //   - Count vaccines overdue across ALL patients

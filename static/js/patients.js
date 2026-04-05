@@ -4,7 +4,28 @@
 
 async function createPatient() {
     const response = await fetch("http://localhost:5000/api/patients/", {
-            method: "POST",
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            name: document.getElementById("name").value,
+            species: document.getElementById("species").value,
+            breed: document.getElementById("breed").value,
+            sex: document.getElementById("sex").value,
+            dob: document.getElementById("dob").value,
+            neutered: document.getElementById("neutered").checked,
+            insurance_id: document.getElementById("insurance_id").value,
+            weight: parseFloat(document.getElementById("weight").value)
+        })
+    });
+
+    const data = await response.json();
+    document.getElementById("result").textContent = JSON.stringify(data, null, 2);
+}
+
+async function delete_patient() {
+
+    const response = await fetch("http://localhost:5000/api/patients/", {
+            method: "DELETE",
             headers: {
                 "Content-Type": "application/json"
             },
@@ -23,7 +44,6 @@ async function createPatient() {
     const data = await response.json();
     console.log(data);
 }
-
 
 // ------------------------------------------------------------
 // TODO: Fetch patient list on page load

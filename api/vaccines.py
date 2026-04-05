@@ -1,4 +1,10 @@
 from flask import Blueprint, jsonify, request
+import easyocr
+import easyocr
+import base64
+import numpy as np
+from PIL import Image
+import io
 
 vaccines_bp = Blueprint("vaccines", __name__)
 
@@ -15,6 +21,15 @@ vaccines_bp = Blueprint("vaccines", __name__)
 # breed, and age. Core vaccines differ from lifestyle-based boosters.
 # ---------------------------------------------------------------------------
 
+
+@vaccines_bp.route("/", methods=["POST"])
+def read_vaccines_paper():
+    # TODO: Easy ocr will read the data returned from the .js frontend
+    data = request.get_json()
+    image_data = base64.b64decode(data["image"])
+    image = Image.open(io.BytesIO(image_data))
+
+    pass
 
 @vaccines_bp.route("/", methods=["GET"])
 def list_vaccines():

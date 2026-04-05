@@ -38,15 +38,17 @@
       -->
     </div>
 
-    <h1>Add Patient</h1>
-    <button onclick="createPatient()">Create Patient</button>
-    <pre id="result"></pre>
+    <a href="/register">Register Pet</a>
 
+
+    <button onclick="delete_patient()">Remove Patient</button>
+    <pre id="result"></pre>
     <script src="/static/patients.js"></script>
 
   </header>
 
   <main>
+
 
     <!-- ================================================================ -->
     <!-- Sidebar — Patient list                                            -->
@@ -63,6 +65,7 @@
            On mouseenter: prefetchOnHover(patient.id) — background fetch
            On click: loadPatientDetail(patient.id) — read cache or fetch
       -->
+
       <p>Loading patients&hellip;</p>
     </section>
 
