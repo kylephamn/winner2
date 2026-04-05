@@ -1,39 +1,385 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Register Your Pet</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register Your Pet — Pawff</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
+  <style>
+    body { background: #D8D6D2; }
+
+    .reg-shell {
+      width: 100%;
+      max-width: 480px;
+      min-height: 100vh;
+      margin: 0 auto;
+      background: var(--csu-cream);
+      box-shadow: 0 0 60px rgba(0,0,0,0.18);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Header ── */
+    .reg-header {
+      height: 56px;
+      background: var(--csu-cream);
+      border-bottom: 1px solid var(--csu-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .reg-header::after {
+      content: '';
+      position: absolute;
+      bottom: -2px; left: 0; right: 0;
+      height: 2px;
+      background: var(--csu-gold);
+    }
+
+    .reg-header h1 {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--csu-dark);
+      flex: 1;
+      text-align: center;
+    }
+
+    .back-btn {
+      width: 40px; height: 40px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      color: var(--csu-mid);
+      transition: background var(--transition);
+    }
+
+    .back-btn svg { width: 22px; height: 22px; }
+    .back-btn:hover { background: var(--pale-green-soft); color: var(--csu-green); border: none; }
+    .back-btn:hover::before { display: none; }
+
+    /* ── Content ── */
+    .reg-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 16px 40px;
+    }
+
+    .reg-illustration {
+      text-align: center;
+      font-size: 64px;
+      margin-bottom: 8px;
+      animation: bounce 2s ease-in-out infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-8px); }
+    }
+
+    .reg-subtitle {
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--csu-mid);
+      margin-bottom: 24px;
+    }
+
+    /* ── Form card ── */
+    .reg-card {
+      background: #fff;
+      border-radius: var(--radius-lg);
+      border: 1.5px solid var(--csu-border);
+      box-shadow: var(--shadow-sm);
+      padding: 20px 18px;
+      margin-bottom: 16px;
+    }
+
+    .reg-card-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--pale-green-deep);
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      margin-bottom: 14px;
+    }
+
+    .form-group { margin-bottom: 14px; }
+
+    .form-group:last-child { margin-bottom: 0; }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--csu-dark);
+      margin-bottom: 5px;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1.5px solid var(--csu-border);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-main);
+      font-size: 14px;
+      color: var(--csu-dark);
+      background: var(--csu-cream);
+      outline: none;
+      transition: border-color var(--transition), box-shadow var(--transition);
+      appearance: none;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      border-color: var(--pale-green-deep);
+      box-shadow: 0 0 0 3px rgba(111, 175, 136, 0.16);
+      background: #fff;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    /* Checkbox row */
+    .check-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 14px;
+      background: var(--csu-cream);
+      border: 1.5px solid var(--csu-border);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: border-color var(--transition);
+    }
+
+    .check-row:hover { border-color: var(--pale-green); }
+
+    .check-row input[type="checkbox"] {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 20px; height: 20px;
+      border: 2px solid var(--csu-border);
+      border-radius: 5px;
+      background: #fff;
+      cursor: pointer;
+      position: relative;
+      flex-shrink: 0;
+      transition: all var(--transition);
+    }
+
+    .check-row input[type="checkbox"]:checked {
+      background: var(--csu-green);
+      border-color: var(--csu-green);
+    }
+
+    .check-row input[type="checkbox"]:checked::after {
+      content: '';
+      position: absolute;
+      top: 2px; left: 5px;
+      width: 5px; height: 9px;
+      border: 2px solid #fff;
+      border-top: none;
+      border-left: none;
+      transform: rotate(45deg);
+    }
+
+    .check-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--csu-dark);
+    }
+
+    /* ── Submit button ── */
+    .reg-submit {
+      width: 100%;
+      padding: 14px;
+      background: var(--pale-green-deep);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-md);
+      font-family: var(--font-main);
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+      box-shadow: 0 4px 12px rgba(111, 175, 136, 0.35);
+      margin-bottom: 12px;
+    }
+
+    .reg-submit:hover {
+      background: var(--csu-green);
+      box-shadow: 0 6px 18px rgba(30, 77, 43, 0.3);
+      border: none;
+      color: #fff;
+      transform: translateY(-1px);
+    }
+
+    .reg-submit:hover::before { display: none; }
+    .reg-submit:active { transform: scale(0.98); box-shadow: none; }
+
+    /* ── Alt action ── */
+    .reg-alt {
+      text-align: center;
+      padding: 12px;
+      background: #fff;
+      border-radius: var(--radius-md);
+      border: 1.5px solid var(--csu-border);
+    }
+
+    .reg-alt p {
+      font-size: 13px;
+      color: var(--csu-mid);
+      font-weight: 500;
+      margin-bottom: 6px;
+    }
+
+    .reg-alt a {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--pale-green-deep);
+    }
+
+    .reg-alt a:hover { color: var(--csu-green); }
+
+    /* ── Success / result ── */
+    #result {
+      text-align: center;
+      padding: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--pale-green-deep);
+      min-height: 20px;
+    }
+  </style>
 </head>
 <body>
-    <header>
-        <button onclick="window.location.href='/'">Home Page</button>
-    </header>
+<div class="reg-shell">
 
-    <h1>Register Pet</h1>
+  <!-- Header -->
+  <header class="reg-header">
+    <button class="back-btn" onclick="window.location.href='/'" title="Back">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5M12 5l-7 7 7 7"/>
+      </svg>
+    </button>
+    <h1>Register Your Pet</h1>
+    <div style="width:40px"></div>
+  </header>
 
-    <div>
-        <form id="patient-form">
-            <input type="text" id="name" placeholder="Name" /><br>
-            <input type="text" id="species" placeholder="Species" /><br>
-            <input type="text" id="breed" placeholder="Breed" /><br>
-            <input type="text" id="sex" placeholder="Sex" /><br>
-            <input type="date" id="dob" /><br>
-            <input type="checkbox" id="neutered"> Neutered<br>
-            <input type="text" id="insurance_id" placeholder="Insurance ID" /><br>
-            <input type="number" id="weight" placeholder="Weight" /><br>
-            <button type="button" onclick="createPatient()">Add Patient</button>
-        </form>
+  <!-- Content -->
+  <div class="reg-content">
 
+    <div class="reg-illustration">🐾</div>
+    <p class="reg-subtitle">Tell us about your furry friend</p>
+
+    <!-- Basic info -->
+    <div class="reg-card">
+      <p class="reg-card-title">Basic Info</p>
+
+      <div class="form-group">
+        <label for="name">Pet Name</label>
+        <input type="text" id="name" placeholder="e.g. Buddy, Luna, Bae" autocomplete="off" />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="species">Species</label>
+          <select id="species">
+            <option value="">Select…</option>
+            <option value="Dog">Dog</option>
+            <option value="Cat">Cat</option>
+            <option value="Rabbit">Rabbit</option>
+            <option value="Bird">Bird</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="sex">Sex</label>
+          <select id="sex">
+            <option value="">Select…</option>
+            <option value="M">Male</option>
+            <option value="F">Female</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="breed">Breed</label>
+        <input type="text" id="breed" placeholder="e.g. Labrador, Siamese" autocomplete="off" />
+      </div>
+
+      <div class="form-group">
+        <label for="dob">Date of Birth</label>
+        <input type="date" id="dob" />
+      </div>
+
+      <div class="form-group">
+        <label>Spayed / Neutered</label>
+        <label class="check-row">
+          <input type="checkbox" id="neutered" />
+          <span class="check-label">Yes, my pet is spayed or neutered</span>
+        </label>
+      </div>
     </div>
 
-    <h2>Or</h2>
-    </button>
-    <a href="/scan">Scan</a>
-    </button>
-    <pre id="result"></pre>
-    <script src="/static/js/patients.js"></script>
+    <!-- Health info -->
+    <div class="reg-card">
+      <p class="reg-card-title">Health Details</p>
 
+      <div class="form-row">
+        <div class="form-group">
+          <label for="weight">Weight (lbs)</label>
+          <input type="number" id="weight" placeholder="e.g. 45" min="0" step="0.1" />
+        </div>
+        <div class="form-group">
+          <label for="insurance_id">Insurance ID</label>
+          <input type="text" id="insurance_id" placeholder="Optional" autocomplete="off" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Submit -->
+    <button class="reg-submit" onclick="handleRegister()">Register Pet</button>
+
+    <p id="result"></p>
+
+    <!-- Alt: scan -->
+    <div class="reg-alt">
+      <p>Have a paper vaccine record?</p>
+      <a href="/scan">Scan it instead →</a>
+    </div>
+
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/patients.js') }}"></script>
+<script>
+  async function handleRegister() {
+    const btn = document.querySelector('.reg-submit');
+    btn.textContent = 'Registering…';
+    btn.disabled = true;
+
+    await createPatient();
+
+    btn.textContent = 'Register Pet';
+    btn.disabled = false;
+  }
+</script>
 </body>
 </html>

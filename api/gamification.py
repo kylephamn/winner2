@@ -28,6 +28,13 @@ POINTS_PER_EVENT = {
     "grooming":        50,
 }
 
+DAILY_GOAL_PTS = {
+    "breakfast": 50,
+    "walk":      100,
+    "teeth":     30,
+    "checkin":   10,
+}
+
 
 def _compute_percentile(user_points, all_points):
     """Return the percentage of users scoring strictly below user_points (0–100)."""
@@ -230,3 +237,91 @@ def leaderboard():
         entry["percentile"] = _compute_percentile(entry["points"], all_points)
 
     return jsonify({"leaderboard": ranked[:limit]}), 200
+
+
+@gamification_bp.route("/pet-rank", methods=["GET"])
+def pet_rank():
+    """Return a pet's daily-goal points and percentile rank across all pets.
+
+    Query param: pet_id
+    """
+    pet_id = request.args.get("pet_id")
+    if not pet_id:
+        return jsonify({"error": "pet_id is required"}), 400
+
+    doc = db.collection("pets").document(pet_id).get()
+    if not doc.exists:
+        return jsonify({"error": "Pet not found"}), 404
+
+    goal_pts = doc.to_dict().get("gamification", {}).get("daily_goal_points", 0)
+
+    all_pts = [
+        d.to_dict().get("gamification", {}).get("daily_goal_points", 0)
+        for d in db.collection("pets").stream()
+    ]
+    percentile = _compute_percentile(goal_pts, all_pts)
+
+    return jsonify({"goal_points": goal_pts, "percentile": percentile}), 200
+
+
+@gamification_bp.route("/daily-goal", methods=["POST"])
+def log_daily_goal():
+    """Award points for a daily goal completion (once per goal per day, per pet).
+
+    Body: { "pet_id": str, "goal_id": str, "date": str (YYYY-MM-DD), "checked": bool }
+    Returns: { "percentile": float, "goal_points": int, "already_awarded": bool }
+    """
+    data = request.get_json(silent=True) or {}
+    pet_id  = data.get("pet_id")
+    goal_id = data.get("goal_id")
+    date    = data.get("date")
+    checked = data.get("checked", True)
+
+    if not pet_id or not goal_id or not date:
+        return jsonify({"error": "pet_id, goal_id, and date are required"}), 400
+
+    pts = DAILY_GOAL_PTS.get(goal_id)
+    if pts is None:
+        return jsonify({"error": f"Unknown goal_id '{goal_id}'"}), 400
+
+    doc_ref = db.collection("pets").document(pet_id)
+    doc = doc_ref.get()
+    if not doc.exists:
+        return jsonify({"error": "Pet not found"}), 404
+
+    pet_data   = doc.to_dict()
+    gamif      = pet_data.get("gamification", {})
+    goal_pts   = gamif.get("daily_goal_points", 0)
+    daily_log  = gamif.get("daily_goals", {})
+
+    # daily_log structure: { "2025-04-05": { "breakfast": true, ... }, ... }
+    day_entry       = daily_log.get(date, {})
+    already_awarded = day_entry.get(goal_id, False)
+
+    if checked and not already_awarded:
+        goal_pts += pts
+        day_entry[goal_id] = True
+        doc_ref.update({
+            "gamification.daily_goal_points":          goal_pts,
+            f"gamification.daily_goals.{date}.{goal_id}": True,
+        })
+    elif not checked and already_awarded:
+        goal_pts = max(0, goal_pts - pts)
+        day_entry[goal_id] = False
+        doc_ref.update({
+            "gamification.daily_goal_points":          goal_pts,
+            f"gamification.daily_goals.{date}.{goal_id}": False,
+        })
+
+    # Compute percentile across all pets by daily_goal_points
+    all_pets_pts = [
+        d.to_dict().get("gamification", {}).get("daily_goal_points", 0)
+        for d in db.collection("pets").stream()
+    ]
+    percentile = _compute_percentile(goal_pts, all_pets_pts)
+
+    return jsonify({
+        "goal_points":    goal_pts,
+        "percentile":     percentile,
+        "already_awarded": already_awarded,
+    }), 200

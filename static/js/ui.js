@@ -1,80 +1,158 @@
 // ============================================================
-// ui.js — shared UI utilities and client-side patient cache
-// ============================================================
-//
-// Patient prefetch cache strategy:
-//   Cache is a plain JS object keyed by patient ID.
-//   Each entry stores:  { data: <patient object>, timestamp: <Date.now()> }
-//   TTL is 60 seconds. Entries older than 60s are treated as a cache miss.
-//   Cache is invalidated (entry deleted) on any write operation to that patient
-//   (POST, PUT, DELETE on patients, notes, vaccines, visits, labs, or grooming).
-//   Cache is populated by:
-//     1. A background prefetch fired on patient card mouseenter
-//     2. A foreground fetch fired on patient card click (if cache miss)
+// ui.js — tab switching, loading overlay, cache, notifications
 // ============================================================
 
-const API_BASE = "/api";
+const API_BASE = '/api';
 
-// ------------------------------------------------------------
-// TODO: formatDate(dateStr)
-//   - Accept an ISO date string or timestamp
-//   - Return a human-readable string, e.g. "Apr 3, 2026"
-//   - Handle null/undefined gracefully (return "—")
-// ------------------------------------------------------------
+// ── Patient cache ─────────────────────────────────────────────
+const patientCache = {};
+const CACHE_TTL    = 60000; // ms
 
-// ------------------------------------------------------------
-// TODO: showLoading(context)
-//   - Show #loading-overlay
-//   - Trigger shimmer animation on skeleton placeholders
-//   - Call gamification.js fact fetcher to load a fun fact into .fact-card
-//   - Enforce a minimum display time of 800ms
-//     (do not allow hideLoading to resolve before 800ms have elapsed)
-//   - Store start timestamp so hideLoading can calculate remaining wait
-//   - context: optional string describing what is loading (for accessibility)
-// ------------------------------------------------------------
+let _activePatientId = null;
+let _loadingStart    = null;
+let _factPromise     = null;
+const MIN_LOADING_MS = 800;
 
-// ------------------------------------------------------------
-// TODO: hideLoading(context)
-//   - Wait for any remaining time in the 800ms minimum
-//   - Fade in the real content (CSS transition)
-//   - Hide #loading-overlay
-//   - Remove shimmer classes from skeleton elements
-// ------------------------------------------------------------
+// ── Tab switching ─────────────────────────────────────────────
 
-// ------------------------------------------------------------
-// TODO: renderError(msg)
-//   - Display an error message in the active panel
-//   - Use a styled error card (red left border, icon, message text)
-//   - Auto-dismiss after 5 seconds, or on user click
-// ------------------------------------------------------------
+function switchTab(tabName) {
+  document.querySelectorAll('.app-screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
 
-// ------------------------------------------------------------
-// TODO: showNotification(msg, urgency)
-//   - Display a transient notification banner (top of detail panel or fixed position)
-//   - urgency levels: "info", "warning", "urgent"
-//   - "info"    → green/neutral style
-//   - "warning" → gold/amber style (e.g. upcoming vaccine reminder)
-//   - "urgent"  → red style (e.g. overdue vaccine, critical risk flag)
-//   - Auto-dismiss after 4–6 seconds depending on urgency
-// ------------------------------------------------------------
+  const screen = document.getElementById('screen-' + tabName);
+  const btn    = document.getElementById('nav-'    + tabName);
+  if (screen) screen.classList.add('active');
+  if (btn)    btn.classList.add('active');
 
-// ------------------------------------------------------------
-// TODO: prefetchOnHover(patientId)
-//   - Fire GET /api/patients/<id> in the background
-//   - On success, write to cache: patientCache[patientId] = { data, timestamp }
-//   - Do not update UI — this is a silent background operation
-//   - Debounce: don't fire if a prefetch for this patient is already in-flight
-// ------------------------------------------------------------
+  // Lazy-load profile patient list on first visit
+  if (tabName === 'profile') {
+    const list = document.getElementById('patient-list');
+    if (list && list.querySelector('.empty-state')?.textContent.includes('Loading')) {
+      if (typeof loadPatients === 'function') loadPatients();
+    }
+  }
+}
 
-// ------------------------------------------------------------
-// TODO: getCachedPatient(patientId)
-//   - Read patientCache[patientId]
-//   - If entry exists and (Date.now() - timestamp) < 60000, return data
-//   - Otherwise return null (cache miss or expired)
-// ------------------------------------------------------------
+// ── Loading overlay ───────────────────────────────────────────
 
-// ------------------------------------------------------------
-// TODO: invalidateCache(patientId)
-//   - Delete patientCache[patientId]
-//   - Call this after any successful write (POST/PUT/DELETE) affecting a patient
-// ------------------------------------------------------------
+function showLoading() {
+  _loadingStart = Date.now();
+  const overlay = document.getElementById('loading-overlay');
+  if (overlay) {
+    overlay.classList.remove('hidden');
+    overlay.style.display = 'flex';
+  }
+  // Fetch a fun fact while loading
+  if (typeof fetchAndShowFact === 'function') _factPromise = fetchAndShowFact();
+}
+
+async function hideLoading() {
+  const elapsed   = Date.now() - (_loadingStart || 0);
+  const remaining = Math.max(0, MIN_LOADING_MS - elapsed);
+  await Promise.all([
+    remaining > 0 ? new Promise(r => setTimeout(r, remaining)) : Promise.resolve(),
+    _factPromise || Promise.resolve(),
+  ]);
+
+  const overlay = document.getElementById('loading-overlay');
+  if (overlay) {
+    overlay.classList.add('hidden');
+    setTimeout(() => { if (overlay) overlay.style.display = 'none'; }, 350);
+  }
+}
+
+// ── Date formatting ───────────────────────────────────────────
+
+function formatDate(dateStr) {
+  if (!dateStr) return '—';
+  try {
+    // Append time to avoid timezone shift when parsing date-only strings
+    const d = new Date(dateStr.includes('T') ? dateStr : dateStr + 'T00:00:00');
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  } catch { return dateStr; }
+}
+
+// ── Notifications ─────────────────────────────────────────────
+
+function showNotification(msg, urgency = 'info') {
+  const icons = { info: '🐾', warning: '⚠️', urgent: '🚨' };
+
+  const banner = document.createElement('div');
+  banner.className = `notif-banner notif-banner--${urgency}`;
+  banner.innerHTML = `<span>${icons[urgency] || ''}</span><span>${msg}</span>`;
+  banner.style.cursor = 'pointer';
+  banner.onclick = () => banner.remove();
+
+  // Insert at top of the active screen
+  const screen = document.querySelector('.app-screen.active');
+  if (screen) screen.prepend(banner);
+
+  const delay = urgency === 'urgent' ? 6000 : urgency === 'warning' ? 5000 : 3500;
+  setTimeout(() => banner.remove(), delay);
+}
+
+function renderError(msg) {
+  showNotification(msg, 'urgent');
+}
+
+// ── Patient cache ─────────────────────────────────────────────
+
+function getCachedPatient(patientId) {
+  const entry = patientCache[patientId];
+  if (!entry || entry._inflight) return null;
+  if (Date.now() - entry.timestamp > CACHE_TTL) {
+    delete patientCache[patientId];
+    return null;
+  }
+  return entry.data;
+}
+
+async function prefetchOnHover(patientId) {
+  if (patientCache[patientId]) return; // already cached or in-flight
+  patientCache[patientId] = { _inflight: true, timestamp: Date.now() };
+  try {
+    const res = await fetch(`${API_BASE}/patients/${patientId}`);
+    if (res.ok) {
+      patientCache[patientId] = { data: await res.json(), timestamp: Date.now() };
+    } else {
+      delete patientCache[patientId];
+    }
+  } catch {
+    delete patientCache[patientId];
+  }
+}
+
+function invalidateCache(patientId) {
+  delete patientCache[patientId];
+}
+
+// ── Active patient ────────────────────────────────────────────
+
+function setActivePatient(id) { _activePatientId = id; }
+function getActivePatient()   { return _activePatientId; }
+
+// ── Quick action logger ───────────────────────────────────────
+
+function logQuickAction(action) {
+  // Bounce animation on the button
+  const btn = document.querySelector(`.qa-btn[data-action="${action}"]`);
+  if (btn) {
+    btn.style.transform = 'scale(0.88)';
+    setTimeout(() => { btn.style.transform = ''; }, 180);
+  }
+
+  // Map quick actions to daily goals
+  const map = { meals: 'breakfast', play: 'walk', grooming: 'teeth', hydration: null };
+  const goalId = map[action];
+  if (goalId && typeof setGoalState === 'function') {
+    setGoalState(goalId, true);
+    if (typeof renderGoalsList === 'function') {
+      renderGoalsList('goals-list-home');
+      renderGoalsList('goals-list-wellness');
+    }
+    if (typeof updateWellbeingDisplay === 'function') updateWellbeingDisplay();
+  }
+
+  const labels = { meals: 'Meal logged', play: 'Walk logged', grooming: 'Grooming logged', hydration: 'Hydration tracked' };
+  showNotification((labels[action] || 'Logged!') + ' Great job! 🐾', 'info');
+}
