@@ -7,6 +7,10 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
 </head>
 <body>
+<header>
+<button onclick="window.location.href='/'">Home Page</button>
+    <button onclick="window.location.href='/register'">Manual Register</button>
+</header>
     <section id="vaccine-loader">
         <h2>Scan Vaccine Paper Record</h2>
         <input type="file" id="vaccine-image" accept="image/*" />
