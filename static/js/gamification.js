@@ -73,13 +73,13 @@ function updateWellbeingDisplay() {
   let faceImg, bodyImg;
   if (pct >= 75) {
     faceImg = '/images/face3.png';   // happy
-    bodyImg = '/images/body3.jpeg';  // excited/wagging
+    bodyImg = '/images/body3.png';  // excited/wagging
   } else if (pct >= 40) {
     faceImg = '/images/face1.png';   // neutral
-    bodyImg = '/images/body3.jpeg';
+    bodyImg = '/images/body3.png';
   } else {
     faceImg = '/images/sad_dog.png'; // saddest
-    bodyImg = '/images/body1.jpeg';  // sad
+    bodyImg = '/images/body1.png';  // sad
   }
 
   const ids = ['wb-face', 'header-pet-face'];
