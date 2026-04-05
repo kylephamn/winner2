@@ -77,7 +77,7 @@ def mood_score(doc):
         elif age <= 10:
             return "/images/face2.png"
         else:
-            return "/images/face3.png"
+            return "/images/sad_dog.png"
     else:
         if age < 5:
             return "/images/face5.png"
