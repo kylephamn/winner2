@@ -71,14 +71,21 @@ def mood_score(doc):
         return None
 
     age = (date.today() - date.fromisoformat(dob)).days // 365
-    dog = 'Dog'
-    if doc.get('species').casefold() == dog.casefold():
+    species = (doc.get('species') or '').casefold()
+    if species == 'dog':
         if age < 5:
             return "/images/face1.png"
         elif age <= 10:
             return "/images/face2.png"
         else:
             return "/images/sad_dog.png"
+    elif species == 'cat':
+        if age < 2:
+            return "/images/cat_happy.png"
+        elif age <= 8:
+            return "/images/cat_neutral.png"
+        else:
+            return "/images/cat_sad.png"
     else:
         if age < 5:
             return "/images/face5.png"

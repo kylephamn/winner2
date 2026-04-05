@@ -137,6 +137,9 @@ function renderPatientHero(patient) {
     ptsEl.textContent = '— Wellness Points';
   }
 
+  // Track species so gamification.js can pick the right images
+  if (typeof setActivePetSpecies === 'function') setActivePetSpecies(patient.species);
+
   // Update header avatar and body image based on wellness score
   if (typeof updateWellbeingDisplay === 'function') updateWellbeingDisplay();
 }
@@ -148,11 +151,14 @@ function renderPatientInfo(patient) {
   if (!infoEl) return;
 
   const moodLabels = {
-    '/images/face1.png': 'Feeling great',
-    '/images/face2.png': 'Doing well',
-    '/images/face3.png': 'Happy & healthy',
-    '/images/face4.png': 'Content',
-    '/images/face5.png': 'Playful',
+    '/images/face1.png':       'Feeling great',
+    '/images/face2.png':       'Doing well',
+    '/images/face3.png':       'Happy & healthy',
+    '/images/face4.png':       'Content',
+    '/images/face5.png':       'Playful',
+    '/images/cat_happy.png':   'Purrfectly happy',
+    '/images/cat_neutral.png': 'Cool & content',
+    '/images/cat_sad.png':     'Feeling grumpy',
   };
 
   const moodHTML = patient.mood_image
