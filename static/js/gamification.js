@@ -8,18 +8,18 @@ function setActivePetSpecies(species) { _activePetSpecies = (species || '').toLo
 
 // ── Daily goals definition ────────────────────────────────────
 const DAILY_GOALS = [
-  { id: 'breakfast', icon: '🍽️', label: 'Healthy Breakfast', pts: 50,  bg: '#F9D8A0' },
-  { id: 'walk',      icon: '🐕', label: 'A Long Walk',        pts: 100, bg: '#F4A8A0' },
-  { id: 'teeth',     icon: '🦷', label: 'Teeth Brushing',     pts: 30,  bg: '#A0D8D4' },
-  { id: 'checkin',   icon: '❤️', label: 'Check-in with Vet', pts: 10,  bg: '#F4A0B8' },
+  { id: 'breakfast', icon: '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6h3v7"/></svg>', label: 'Healthy Breakfast', pts: 50,  bg: '#F9D8A0' },
+  { id: 'walk',      icon: '<svg viewBox="0 0 24 24" width="22" height="22" fill="white"><circle cx="7" cy="4.5" r="1.5"/><circle cx="12" cy="3" r="1.5"/><circle cx="17" cy="4.5" r="1.5"/><circle cx="20.5" cy="9" r="1.5"/><path d="M12 21.5c-3 0-6-2.5-5.5-6 .5-3 3-3.5 4.5-2 .5.5 1.5.5 2 0 1.5-1.5 4-1 4.5 2 .5 3.5-2.5 6-5.5 6z"/></svg>', label: 'A Long Walk',        pts: 100, bg: '#F4A8A0' },
+  { id: 'teeth',     icon: '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6a4 4 0 0 1 4 4c0 2-1.5 4-1.5 7l-1 6c-.2 1-1 1.2-1.5.5L14 18a2 2 0 0 0-4 0l-1 2.5c-.5.7-1.3.5-1.5-.5l-1-6C6.5 11 5 9 5 7a4 4 0 0 1 4-4z"/></svg>', label: 'Teeth Brushing',     pts: 30,  bg: '#A0D8D4' },
+  { id: 'checkin',   icon: '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>', label: 'Check-in with Vet', pts: 10,  bg: '#F4A0B8' },
 ];
 
 const BADGE_META = {
-  first_steps:       { emoji: '👟', name: 'First Steps'        },
-  health_starter:    { emoji: '🌱', name: 'Health Starter'     },
-  wellness_champion: { emoji: '🏆', name: 'Wellness Champion'  },
-  dedicated_owner:   { emoji: '⭐', name: 'Dedicated Owner'    },
-  pet_health_hero:   { emoji: '🦸', name: 'Pet Health Hero'    },
+  first_steps:       { emoji: '<svg viewBox="0 0 24 24" width="24" height="24" fill="white"><circle cx="7" cy="4.5" r="1.5"/><circle cx="12" cy="3" r="1.5"/><circle cx="17" cy="4.5" r="1.5"/><circle cx="20.5" cy="9" r="1.5"/><path d="M12 21.5c-3 0-6-2.5-5.5-6 .5-3 3-3.5 4.5-2 .5.5 1.5.5 2 0 1.5-1.5 4-1 4.5 2 .5 3.5-2.5 6-5.5 6z"/></svg>', name: 'First Steps'        },
+  health_starter:    { emoji: '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8C8 10 5.9 16.17 3.82 22c8.41-3.48 10.17-8.17 10.18-11z"/><path d="M3.82 22c2 1 4 2 6 2a13 13 0 0 0 13-13c0-4-2-7-4-9"/></svg>', name: 'Health Starter'     },
+  wellness_champion: { emoji: '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M17 2H7a2 2 0 0 0-2 2v4c0 3.31 2.69 6 6 6s6-2.69 6-6V4a2 2 0 0 0-2-2z"/><path d="M19 5h2a2 2 0 0 1 2 2v1a4 4 0 0 1-4 4h-1"/><path d="M5 5H3a2 2 0 0 0-2 2v1a4 4 0 0 0 4 4h1"/></svg>', name: 'Wellness Champion'  },
+  dedicated_owner:   { emoji: '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>', name: 'Dedicated Owner'    },
+  pet_health_hero:   { emoji: '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>', name: 'Pet Health Hero'    },
 };
 
 // ── localStorage goal state (resets each calendar day, per pet) ──

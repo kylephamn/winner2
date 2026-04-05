@@ -295,6 +295,9 @@ function renderResultCard(location, isEmergency) {
       ${directionsHtml}
     </div>
   `;
+
+  if (location.id) enrichCardWithDetails(location.id, card);
+
   return card;
 }
 
@@ -321,6 +324,48 @@ function renderError(msg) {
       <p class="loc-zero-sub">If your animal is in immediate danger, call 911.</p>
     </div>
   `;
+}
+
+// ── Detail enrichment (phone + website) ──────────────────────
+
+const _detailCache = {};
+
+async function enrichCardWithDetails(locationId, card) {
+  if (_detailCache[locationId] === undefined) {
+    _detailCache[locationId] = null; // mark in-flight
+    try {
+      const resp = await fetch(`/api/locations/${locationId}`);
+      _detailCache[locationId] = resp.ok ? await resp.json() : null;
+    } catch (e) {
+      _detailCache[locationId] = null;
+    }
+  }
+
+  const detail = _detailCache[locationId];
+  if (!detail) return;
+
+  const actionsEl = card.querySelector(".loc-card-actions");
+  if (!actionsEl) return;
+
+  if (detail.phone && !actionsEl.querySelector(".loc-phone-link")) {
+    const a = document.createElement("a");
+    a.href = `tel:${detail.phone}`;
+    a.className = "loc-phone-link";
+    a.textContent = detail.phone;
+    actionsEl.prepend(a);
+  }
+
+  if (detail.website && !actionsEl.querySelector(".loc-website-link")) {
+    const a = document.createElement("a");
+    a.href = detail.website;
+    a.target = "_blank";
+    a.rel = "noopener";
+    a.className = "loc-website-link";
+    a.textContent = "Website";
+    const directionsBtn = actionsEl.querySelector(".loc-directions-btn");
+    if (directionsBtn) actionsEl.insertBefore(a, directionsBtn);
+    else actionsEl.appendChild(a);
+  }
 }
 
 // ── Directions ────────────────────────────────────────────────

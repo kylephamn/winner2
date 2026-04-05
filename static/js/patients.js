@@ -123,6 +123,9 @@ function renderPatientHero(patient) {
 
   if (nameEl) nameEl.textContent = patient.name || 'Your Pet';
 
+  const headerTitle = document.getElementById('app-header-title');
+  if (headerTitle) headerTitle.textContent = patient.name ? `${patient.name}'s Well-being` : 'My Pet Well-being';
+
   // Age from DOB
   let ageStr = '';
   if (patient.dob) {

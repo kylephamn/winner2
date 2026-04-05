@@ -16,7 +16,7 @@
     <button class="app-header__avatar-btn" onclick="switchTab('profile')" title="Profile">
       <img src="/images/face1.png" id="header-pet-face" alt="Pet" class="header-avatar" />
     </button>
-    <h1 class="app-header__title">My Pet Well-being</h1>
+    <h1 class="app-header__title" id="app-header-title">My Pet Well-being</h1>
     <button class="app-header__settings icon-btn" onclick="switchTab('profile')" title="Settings">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="3"/>
@@ -51,19 +51,27 @@
       <!-- Quick Actions -->
       <div class="quick-actions-row">
         <button class="qa-btn" onclick="logQuickAction('hydration')" data-action="hydration">
-          <span class="qa-icon" style="--qa-color:#B3D9F0">💧</span>
+          <span class="qa-icon" style="--qa-color:#B3D9F0">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#3d7fa8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+          </span>
           <span class="qa-label">Hydration</span>
         </button>
         <button class="qa-btn" onclick="logQuickAction('meals')" data-action="meals">
-          <span class="qa-icon" style="--qa-color:#F9D8A0">🍽️</span>
+          <span class="qa-icon" style="--qa-color:#F9D8A0">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#b07030" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6h3v7"/></svg>
+          </span>
           <span class="qa-label">Meals</span>
         </button>
         <button class="qa-btn" onclick="logQuickAction('play')" data-action="play">
-          <span class="qa-icon" style="--qa-color:#B4EAB0">🎾</span>
+          <span class="qa-icon" style="--qa-color:#B4EAB0">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#3a7a40" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3.6 9a12 12 0 0 1 16.8 0"/><path d="M3.6 15a12 12 0 0 0 16.8 0"/></svg>
+          </span>
           <span class="qa-label">Play</span>
         </button>
         <button class="qa-btn" onclick="logQuickAction('grooming')" data-action="grooming">
-          <span class="qa-icon" style="--qa-color:#DFC8F4">✂️</span>
+          <span class="qa-icon" style="--qa-color:#DFC8F4">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#7040a0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>
+          </span>
           <span class="qa-label">Grooming</span>
         </button>
       </div>
