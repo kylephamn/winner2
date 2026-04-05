@@ -2,3 +2,11 @@ flask
 firebase-admin
 flask-cors
 easyocr
+numpy
+Pillow
+torch
+transformers
+opencv-python
+pandas
+polars
+scikit-learn
