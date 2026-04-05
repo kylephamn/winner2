@@ -30,8 +30,8 @@ users_bp = Blueprint("users", __name__)
 # }
 # ---------------------------------------------------------------------------
 
-REQUIRED_FIELDS = {"first_name", "last_name", "phone", "address", "dob"}
-UPDATABLE_FIELDS = {"first_name", "last_name", "phone", "address", "dob"}
+REQUIRED_FIELDS = {"first_name", "last_name", "email", "phone", "address", "dob"}
+UPDATABLE_FIELDS = {"first_name", "last_name", "email", "phone", "address", "dob"}
 
 # Points awarded per event type
 POINTS_PER_EVENT = {
