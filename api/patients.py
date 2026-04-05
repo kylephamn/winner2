@@ -71,13 +71,18 @@ def mood_score(doc):
         return None
 
     age = (date.today() - date.fromisoformat(dob)).days // 365
-
-    if age < 5:
-        return "/images/face1.png"
-    elif age <= 10:
-        return "/images/face2.png"
+    if doc.get('species') == 'Dog':
+        if age < 5:
+            return "/images/face1.png"
+        elif age <= 10:
+            return "/images/face2.png"
+        else:
+            return "/images/face3.png"
     else:
-        return "/images/face3.png"
+        if age < 5:
+            return "/images/face5.png"
+        else:
+            return "/images/face4.png"
 
 
 @patients_bp.route("/<patient_id>", methods=["POST"])
