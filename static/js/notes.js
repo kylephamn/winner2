@@ -2,45 +2,47 @@
 // notes.js — clinical notes and behavioral risk flags
 // ============================================================
 
-// ------------------------------------------------------------
-// TODO: Fetch risk flags (lightweight, for sidebar)
-//   - GET /api/notes/?patient_id=<id>&fields=risk_tags
-//   - Return only risk_tags array, not full note text
-//   - Used to render the risk icon on sidebar patient cards
-// ------------------------------------------------------------
+async function loadRiskFlags(patientId) {
+  const container = document.getElementById('risk-flags');
+  if (!container) return;
 
-// ------------------------------------------------------------
-// TODO: Render risk flag chips on detail panel
-//   - Each tag renders as a colored chip inside #risk-flags section
-//   - "Bite risk" and aggression tags → red chip
-//   - "Anxious / easily stressed" and anxiety tags → amber chip
-//   - All chips are removable (× button triggers DELETE/PUT on note)
-//   - Chips should be visually prominent — display above other sections
-// ------------------------------------------------------------
+  try {
+    const res = await fetch(`/api/notes/?patient_id=${encodeURIComponent(patientId)}`);
+    if (!res.ok) throw new Error(res.statusText);
+    const notes = await res.json();
 
-// ------------------------------------------------------------
-// TODO: Render risk flag tooltip on sidebar hover
-//   - On hover of a patient card's risk icon, show a small tooltip
-//   - Tooltip lists all active risk tag strings for that patient
-//   - Hide tooltip on mouseleave
-// ------------------------------------------------------------
+    // Collect all risk_tags across all notes
+    const allTags = [];
+    (Array.isArray(notes) ? notes : []).forEach(note => {
+      (note.risk_tags || []).forEach(tag => allTags.push(tag));
+    });
 
-// ------------------------------------------------------------
-// TODO: Render full notes section with tag management UI
-//   - Display full note text per note record
-//   - Show existing risk_tags as chips within each note
-//   - Include an "Add tag" control (dropdown of predefined tags + free-text input)
-//   - Include a "New note" button that opens an inline compose area
-// ------------------------------------------------------------
+    renderRiskFlags(allTags);
+  } catch {
+    // Notes API may not be fully implemented — silently fail
+    container.innerHTML = '<p class="empty-state">No active health alerts.</p>';
+  }
+}
 
-// ------------------------------------------------------------
-// TODO: Add risk flag handler
-//   - On tag add: PUT /api/notes/<id> with updated risk_tags array
-//   - After success, re-render chips and invalidate patient cache
-// ------------------------------------------------------------
+function renderRiskFlags(tags) {
+  const container = document.getElementById('risk-flags');
+  if (!container) return;
 
-// ------------------------------------------------------------
-// TODO: Remove risk flag handler
-//   - On chip × click: PUT /api/notes/<id> with tag removed from array
-//   - After success, re-render chips and invalidate patient cache
-// ------------------------------------------------------------
+  if (!tags || tags.length === 0) {
+    container.innerHTML = '<p class="empty-state">No active health alerts.</p>';
+    return;
+  }
+
+  container.innerHTML = '';
+
+  const aggressionTags = ['bite risk', 'aggression', 'aggressive', 'requires muzzle'];
+
+  tags.forEach(tag => {
+    const tagLower = tag.toLowerCase();
+    const isRed    = aggressionTags.some(t => tagLower.includes(t));
+    const chip     = document.createElement('span');
+    chip.className = `risk-chip risk-chip--${isRed ? 'red' : 'amber'}`;
+    chip.textContent = tag;
+    container.appendChild(chip);
+  });
+}

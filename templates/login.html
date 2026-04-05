@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login — PetHealth</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background: var(--csu-cream);
+        }
+
+        .login-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 32px 16px;
+        }
+
+        .login-card {
+            background: #fff;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--csu-border);
+            box-shadow: var(--shadow-md);
+            width: 100%;
+            max-width: 400px;
+            overflow: hidden;
+        }
+
+        .login-card-header {
+            background: var(--csu-green);
+            padding: 28px 32px 24px;
+            text-align: center;
+        }
+
+        .login-card-header h1 {
+            color: #fff;
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            margin-bottom: 4px;
+        }
+
+        .login-card-header p {
+            color: rgba(255, 255, 255, 0.72);
+            font-size: 13px;
+        }
+
+        .gold-bar {
+            height: 3px;
+            background: var(--csu-gold);
+        }
+
+        .login-card-body {
+            padding: 28px 32px 32px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--csu-dark);
+            margin-bottom: 6px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--csu-border);
+            border-radius: var(--radius-sm);
+            font-family: var(--font-system);
+            font-size: 14px;
+            color: var(--csu-dark);
+            background: var(--csu-cream);
+            transition: border-color var(--transition), box-shadow var(--transition);
+            outline: none;
+        }
+
+        .form-group input:focus {
+            border-color: var(--csu-green);
+            box-shadow: 0 0 0 3px rgba(30, 77, 43, 0.12);
+            background: #fff;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 11px 16px;
+            background: var(--csu-green);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-system);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background var(--transition), box-shadow var(--transition), transform var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 8px;
+        }
+
+        .login-btn:hover {
+            background: var(--csu-green-hover);
+            box-shadow: var(--shadow-md);
+            color: #fff;
+            border: none;
+        }
+
+        .login-btn:hover::before {
+            display: none;
+        }
+
+        .login-btn:active {
+            transform: scale(0.98);
+        }
+
+        .error-msg {
+            background: #FEE2E2;
+            color: #991B1B;
+            border: 1px solid #FECACA;
+            border-radius: var(--radius-sm);
+            padding: 10px 14px;
+            font-size: 13px;
+            margin-bottom: 16px;
+            display: none;
+        }
+
+        .error-msg.visible {
+            display: block;
+        }
+
+        .login-footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 13px;
+            color: var(--csu-mid);
+        }
+
+        .login-footer a {
+            color: var(--csu-green);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .login-footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>PetHealth</h1>
+    </header>
+
+    <div class="login-wrapper">
+        <div class="login-card">
+            <div class="login-card-header">
+                <h1>Welcome back</h1>
+                <p>Sign in to manage your pets' health</p>
+            </div>
+            <div class="gold-bar"></div>
+            <div class="login-card-body">
+                <div class="error-msg" id="error-msg"></div>
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" placeholder="you@example.com" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" placeholder="••••••••" required />
+                    </div>
+                    <button type="submit" class="login-btn">Sign In</button>
+                </form>
+                <div class="login-footer">
+                    Don't have an account? <a href="/register">Register</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('login-form');
+        const errorMsg = document.getElementById('error-msg');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            errorMsg.classList.remove('visible');
+
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+
+            try {
+                const res = await fetch('/api/users/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password }),
+                });
+
+                if (res.ok) {
+                    window.location.href = '/';
+                } else {
+                    const data = await res.json();
+                    errorMsg.textContent = data.error || 'Invalid email or password.';
+                    errorMsg.classList.add('visible');
+                }
+            } catch {
+                errorMsg.textContent = 'Network error. Please try again.';
+                errorMsg.classList.add('visible');
+            }
+        });
+    </script>
+</body>
+</html>

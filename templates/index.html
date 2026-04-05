@@ -2,251 +2,232 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Vet Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>My Pet Well-being</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
 </head>
 <body>
+<div class="app-shell">
 
-  <!-- ================================================================== -->
-  <!-- Header                                                               -->
-  <!-- ================================================================== -->
-  <header>
-    <h1 style="font-family: 'Quicksand', 'Segoe UI', sans-serif;
-           color: #75CEC9;
-           font-weight: 700;
-           letter-spacing: -1px;
-           display: flex;
-           align-items: center;">
-      Paw<span style="color: #00CEC9;">ff</span>
-    </h1>
-
-    <div class="header-actions">
-      <!-- TODO: "Find Emergency Care" button (locations.js)
-           - Always visible regardless of which patient is selected
-           - Style: red or urgent-gold — visually distinct from all other nav elements
-           - On click: openLocationFinder("emergency")
-           - Opens location finder modal in emergency mode (red accent, large phone numbers)
-           - Include a small urgency icon (e.g. cross or location pin)
-      -->
-
-      <!-- TODO: Global telehealth button
-           - Opens the 6-step telehealth consult flow (telehealth.js)
-           - Pre-fills patient if one is currently selected
-           - Style with .btn-gold for warmth / approachability
-           - Include a small video icon to the left of the label
-      -->
-
-      <!-- TODO: Vaccine reminder notification bell
-           - Displays a red count badge when any patient has overdue vaccines
-           - On click, opens a dropdown listing affected patients + vaccine names
-           - Dropdown links navigate to the patient's detail panel
-           - Rendered and managed by vaccines.js
-      -->
-    </div>
-
-    <button> <a href="/register">Register Pet</a> </button>
-
-
-    <button onclick="delete_patient()">Remove Patient</button>
-    <pre id="result"></pre>
-    <script src="/static/patients.js"></script>
-
+  <!-- ── Header ───────────────────────────────────────────── -->
+  <header class="app-header">
+    <button class="app-header__avatar-btn" onclick="switchTab('profile')" title="Profile">
+      <img src="/images/face1.png" id="header-pet-face" alt="Pet" class="header-avatar" />
+    </button>
+    <h1 class="app-header__title">My Pet Well-being</h1>
+    <button class="app-header__settings icon-btn" onclick="switchTab('profile')" title="Settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+    </button>
   </header>
 
-  <main>
+  <!-- ── Pet selector chips (visible when >1 pet) ─────────── -->
+  <div class="pet-selector" id="pet-selector" style="display:none"></div>
 
+  <!-- ── Screens ──────────────────────────────────────────── -->
+  <div class="screens-container">
 
-    <!-- ================================================================ -->
-    <!-- Sidebar — Patient list                                            -->
-    <!-- ================================================================ -->
-    <section id="patient-list">
-      <!-- TODO: Render patient cards here (patients.js)
-           Each card (.patient-item) should include:
-           - Patient name (.patient-name)
-           - Species + breed + age (.patient-meta)
-           - Risk flag icon (if patient has any active risk_tags) — red icon
-             with tooltip on hover listing all active tags (notes.js)
-           - Vaccine status dot — color matches worst bucket across all vaccines:
-               red = overdue, orange = due-soon, gold = upcoming, none = current
-           On mouseenter: prefetchOnHover(patient.id) — background fetch
-           On click: loadPatientDetail(patient.id) — read cache or fetch
-      -->
+    <!-- HOME ───────────────────────────────────────────────── -->
+    <section class="app-screen active" id="screen-home">
 
-      <p>Loading Pets&hellip;</p>
+      <!-- Hero Card -->
+      <div class="hero-card" id="hero-card">
+        <img src="/images/body3.jpeg" id="hero-body-img" alt="Your pet" class="hero-body-img" />
+        <div class="hero-flowers">
+          <span class="hero-flower">🌸</span>
+          <span class="hero-flower">🌸</span>
+        </div>
+        <div class="hero-info">
+          <h2 class="hero-name" id="hero-name">Loading…</h2>
+          <p class="hero-meta" id="hero-meta">&nbsp;</p>
+          <p class="hero-pts"  id="hero-pts">&nbsp;</p>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="quick-actions-row">
+        <button class="qa-btn" onclick="logQuickAction('hydration')" data-action="hydration">
+          <span class="qa-icon" style="--qa-color:#B3D9F0">💧</span>
+          <span class="qa-label">Hydration</span>
+        </button>
+        <button class="qa-btn" onclick="logQuickAction('meals')" data-action="meals">
+          <span class="qa-icon" style="--qa-color:#F9D8A0">🍽️</span>
+          <span class="qa-label">Meals</span>
+        </button>
+        <button class="qa-btn" onclick="logQuickAction('play')" data-action="play">
+          <span class="qa-icon" style="--qa-color:#B4EAB0">🎾</span>
+          <span class="qa-label">Play</span>
+        </button>
+        <button class="qa-btn" onclick="logQuickAction('grooming')" data-action="grooming">
+          <span class="qa-icon" style="--qa-color:#DFC8F4">✂️</span>
+          <span class="qa-label">Grooming</span>
+        </button>
+      </div>
+
+      <!-- Daily Routine Goals -->
+      <h3 class="section-title">Daily Routine Goals</h3>
+      <div class="goals-list" id="goals-list-home">
+        <div class="goals-placeholder">Loading goals…</div>
+      </div>
+
     </section>
 
-    <!-- ================================================================ -->
-    <!-- Main panel — Patient detail                                        -->
-    <!-- ================================================================ -->
-    <section id="patient-detail">
+    <!-- WELLNESS ────────────────────────────────────────────── -->
+    <section class="app-screen" id="screen-wellness">
 
-      <!-- 1. Behavioral risk flags -->
-      <!-- TODO: Render risk flag chips (notes.js)
-           - Show above all other content — safety-critical information
-           - Red chips for aggression/bite flags, amber for anxiety flags
-           - Each chip has a × to remove the tag
-           - "Add flag" button opens tag selector
-           - Hide this section entirely if patient has no risk_tags
-      -->
-      <div id="risk-flags"></div>
+      <div class="wellbeing-hero-wrap">
+        <img src="/images/body3.jpeg" id="wb-body-img" alt="Pet" class="wb-body-img" />
+      </div>
 
-      <!-- 2. Basic patient info -->
-      <!-- TODO: Render patient info card (patients.js)
-           Fields: name, species, breed, age, weight, sex, owner name, owner contact
-      -->
+      <div class="wellbeing-card">
+        <img src="/images/face3.png" id="wb-face" alt="Mood" class="wb-face-corner" />
+        <p class="wb-label">Today's Well-being</p>
+        <div class="wb-bar-row">
+          <div class="wb-track" id="wb-track">
+            <!-- white mask shrinks from right to reveal gradient -->
+          </div>
+          <span class="wb-pct" id="wb-pct">0%</span>
+        </div>
+      </div>
+
+      <h3 class="section-title">Daily Routine Goals</h3>
+      <div class="goals-list" id="goals-list-wellness"></div>
+
+      <div class="achievement-card" id="achievement-card" style="display:none">
+        <span class="achievement-icon">🏆</span>
+        <div class="achievement-text">
+          <p id="achievement-rank"></p>
+          <p class="achievement-sub">Keep going, you're doing amazing! 🙂</p>
+        </div>
+      </div>
+
+      <h3 class="section-title" style="margin-top:4px">Your Achievements</h3>
+      <div class="badge-shelf" id="badge-shelf">
+        <p class="empty-state">Select a pet to see achievements.</p>
+      </div>
+
+    </section>
+
+    <!-- CARE LOG ────────────────────────────────────────────── -->
+    <section class="app-screen" id="screen-carelog">
+
+      <h3 class="section-title">Visit History</h3>
+      <div id="visit-history">
+        <p class="empty-state">Select a pet to see visit history.</p>
+      </div>
+
+      <h3 class="section-title" style="margin-top:8px">Health Alerts</h3>
+      <div id="risk-flags">
+        <p class="empty-state">No active health alerts.</p>
+      </div>
+
+    </section>
+
+    <!-- VACCINE ─────────────────────────────────────────────── -->
+    <section class="app-screen" id="screen-vaccine">
+
+      <h3 class="section-title">Vaccine Records</h3>
+      <div id="vaccine-card">
+        <p class="empty-state">Select a pet to see vaccine records.</p>
+      </div>
+
+    </section>
+
+    <!-- PROFILE ─────────────────────────────────────────────── -->
+    <section class="app-screen" id="screen-profile">
+
       <div id="patient-info"></div>
 
-      <!-- 3. Active medications + allergies -->
-      <!-- TODO: Render medications and allergies card (patients.js)
-           - List active medications with dose and frequency
-           - List known allergies highlighted in amber
-           - Show "None on record" gracefully if empty
-      -->
-      <div id="meds-allergies"></div>
+      <h3 class="section-title" style="margin-top:4px">Your Pets</h3>
+      <div id="patient-list">
+        <p class="empty-state">Loading pets…</p>
+      </div>
 
-      <!-- 4. Vaccine status card -->
-      <!-- TODO: Render vaccine card (vaccines.js)
-           - List each vaccine with last administered date, next due date
-           - Colored status badge per vaccine (red/orange/gold/green)
-           - Group: overdue first, then due-soon, upcoming, current
-      -->
-      <div id="vaccine-card"></div>
-
-      <!-- 5. Vitals summary -->
-      <!-- TODO: Render vitals card (patients.js)
-           Fields: heart rate, temperature, blood pressure, respiratory rate, weight
-           Show most recent recorded values with date of measurement
-      -->
-      <div id="vitals"></div>
-
-      <!-- 6. Visit history timeline -->
-      <!-- TODO: Render visit timeline (visits.js)
-           - Chronological, newest first
-           - Each entry: date, attending vet, reason, brief notes
-           - "Log new visit" button — surfaces risk flag reminder before form
-           - "Find Nearby Vet" link (soft, non-emergency styling)
-             → openLocationFinder("standard") — for referrals and after-hours planning
-      -->
-      <div id="visit-history"></div>
-
-      <!-- 7. Labs + grooming -->
-      <!-- TODO: Render labs section (patients.js / labs.js)
-           - Table of lab results: date, test name, result, reference range
-           - Flag out-of-range values
-      -->
-      <!-- TODO: Render grooming section (patients.js / grooming.js)
-           - Last groomed date, coat condition notes, next grooming appointment
-      -->
-      <div id="labs-grooming"></div>
-
-      <!-- 8. Gamification progress widget -->
-      <!-- TODO: Render gamification widget (gamification.js)
-           - Points total + progress bar toward next milestone (gold fill)
-           - Badge shelf: earned badges full color, locked badges grayscale
-           - Next milestone label below bar
-           - Warm, celebratory tone — avoid clinical language
-      -->
-      <div id="gamification"></div>
+      <div class="profile-actions">
+        <a href="/register" class="profile-register-btn">+ Register New Pet</a>
+      </div>
 
     </section>
 
-  </main>
+  </div><!-- /screens-container -->
 
-  <!-- ==================================================================== -->
-  <!-- Location finder modal                                                  -->
-  <!--                                                                        -->
-  <!-- Standalone — does not require a patient to be selected.               -->
-  <!-- Opened via openLocationFinder(mode) in locations.js.                 -->
-  <!--                                                                        -->
-  <!-- TODO: #location-finder-modal                                           -->
-  <!--   - Full screen on mobile, large centered modal on desktop             -->
-  <!--   - In "emergency" mode: add .emergency-mode class for red accent UI   -->
-  <!--   - In "standard" mode: standard CSU green/gold styling                -->
-  <!--   - Close button (×) top-right, dismisses and clears state             -->
-  <!--                                                                        -->
-  <!-- TODO: Filter bar (hidden in emergency mode)                            -->
-  <!--   - Toggle: "Emergency only" — hides general clinics                   -->
-  <!--   - Toggle: "Open now" — filters to currently open locations           -->
-  <!--   - Specialty dropdown: General / Emergency / Oncology / Cardiology /  -->
-  <!--     Dermatology / Neurology / Ophthalmology / Exotic & Avian           -->
-  <!--   - onChange: applyFilters(filters) — client-side, no new fetch        -->
-  <!--                                                                        -->
-  <!-- TODO: Map container (#map-container)                                   -->
-  <!--   - Renders embedded map with colored pins (red = ER, green = general) -->
-  <!--   - Blue dot for user's current location                               -->
-  <!--   - On mobile: collapsed by default; toggled by "Show map" button      -->
-  <!--   - On desktop: visible alongside results list                         -->
-  <!--                                                                        -->
-  <!-- TODO: Results list (#location-results)                                 -->
-  <!--   - Two sections: "Emergency / 24-Hour Care" then "General Clinics"    -->
-  <!--   - Each card: name, distance, address, phone (tap-to-call), hours,    -->
-  <!--     "Get Directions" button, specialty badge(s)                        -->
-  <!-- ==================================================================== -->
-  <div id="location-finder-modal" aria-hidden="true">
-    <!-- TODO: Emergency disclaimer banner (visible only in emergency mode)
-         Text: "For life-threatening emergencies, call your nearest 24-hour animal hospital directly."
-         Style: red background, white bold text, full width, top of modal
-    -->
-
-    <!-- TODO: Location input / geolocation status
-         - On open: auto-request geolocation (requestGeolocation())
-         - If denied: show ZIP / city text input with a "Search" button
-         - Show "Using your current location" or "Searching near [ZIP]..." status
-    -->
-
-    <!-- TODO: Filter bar (locations.js applyFilters) — hide in emergency mode -->
-    <div id="location-filter-bar"></div>
-
-    <!-- TODO: Map container (locations.js renderMap) -->
-    <div id="map-container"></div>
-
-    <!-- TODO: Results list (locations.js renderResultsList) -->
-    <div id="location-results"></div>
-  </div>
-
-  <!-- ==================================================================== -->
-  <!-- Loading overlay                                                        -->
-  <!--                                                                        -->
-  <!-- Behavior:                                                              -->
-  <!--   - Minimum display time: 800ms (enforced in ui.js showLoading)        -->
-  <!--   - Fun fact card is centered over the overlay while loading           -->
-  <!--   - Shimmer animation runs behind the fact card on content skeleton    -->
-  <!--   - Overlay fades out smoothly on dismiss (CSS transition)             -->
-  <!--   - If the active patient has overdue vaccines, surface a soft         -->
-  <!--     reminder below the fun fact: "Heads up — [pet] has overdue vaccines" -->
-  <!-- ==================================================================== -->
+  <!-- ── Loading Overlay ──────────────────────────────────── -->
   <div id="loading-overlay" aria-hidden="true">
-    <!-- TODO: Fun fact card
-         - Fetch from GET /api/facts/ each time overlay is shown (gamification.js)
-         - Display "Did you know..." heading + fact text
-         - Centered vertically and horizontally over the overlay
-    -->
-    <div class="fact-card"></div>
-
-    <!-- TODO: Shimmer skeleton placeholders
-         - Render behind the fact card to indicate content is loading
-         - Match the approximate shape of the patient detail layout
-         - Shimmer animation defined in main.css
-    -->
-    <div class="skeleton-content"></div>
+    <div class="fact-card">
+      <p class="fact-eyebrow">Did you know…</p>
+      <p class="fact-text" id="fact-text">Loading a fun fact…</p>
+    </div>
+    <div class="skeleton-content">
+      <div class="skeleton skeleton-card"></div>
+      <div class="skeleton skeleton-text" style="width:55%"></div>
+      <div class="skeleton skeleton-text" style="width:80%"></div>
+      <div class="skeleton skeleton-text" style="width:40%"></div>
+    </div>
   </div>
 
-  <footer>
-    <!-- TODO: Footer content
-         - Clinic name or logo (left-aligned)
-         - Version number or "Powered by CSU Vet" note (right-aligned)
-    -->
-  </footer>
+  <!-- ── Bottom Navigation ────────────────────────────────── -->
+  <nav class="bottom-nav">
 
-  <script src="{{ url_for('static', filename='js/ui.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/patients.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/notes.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/vaccines.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/visits.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/telehealth.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/gamification.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/locations.js') }}"></script>
+    <button class="nav-item active" id="nav-home" onclick="switchTab('home')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9.5L12 3L21 9.5V20a1 1 0 0 1-1 1H15v-6H9v6H4a1 1 0 0 1-1-1V9.5z"/>
+      </svg>
+      <span>Home</span>
+    </button>
+
+    <button class="nav-item" id="nav-wellness" onclick="switchTab('wellness')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+      </svg>
+      <span>Wellness</span>
+    </button>
+
+    <button class="nav-item" id="nav-carelog" onclick="switchTab('carelog')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="5" y="2" width="14" height="20" rx="2"/>
+        <line x1="9" y1="7" x2="15" y2="7"/>
+        <line x1="9" y1="11" x2="15" y2="11"/>
+        <line x1="9" y1="15" x2="13" y2="15"/>
+      </svg>
+      <span>Care Log</span>
+    </button>
+
+    <button class="nav-item" id="nav-vaccine" onclick="switchTab('vaccine')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 2l4 4-4 4"/>
+        <path d="M22 6H9"/>
+        <path d="M4 22l7.5-7.5"/>
+        <path d="M9 11l4 4"/>
+        <path d="M14.5 6.5l3 3"/>
+        <path d="M6 20l-4 2 2-4 9-9"/>
+      </svg>
+      <span>Vaccine</span>
+    </button>
+
+    <button class="nav-item" id="nav-profile" onclick="switchTab('profile')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="8" r="4"/>
+        <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+      </svg>
+      <span>Profile</span>
+    </button>
+
+  </nav>
+
+</div><!-- /app-shell -->
+
+<script src="{{ url_for('static', filename='js/gamification.js') }}"></script>
+<script src="{{ url_for('static', filename='js/ui.js') }}"></script>
+<script src="{{ url_for('static', filename='js/patients.js') }}"></script>
+<script src="{{ url_for('static', filename='js/notes.js') }}"></script>
+<script src="{{ url_for('static', filename='js/vaccines.js') }}"></script>
+<script src="{{ url_for('static', filename='js/visits.js') }}"></script>
+<script src="{{ url_for('static', filename='js/telehealth.js') }}"></script>
+<script src="{{ url_for('static', filename='js/locations.js') }}"></script>
 
 </body>
 </html>

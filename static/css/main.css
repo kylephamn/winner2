@@ -1,486 +1,767 @@
 /* ============================================================
-   Main stylesheet — vet patient dashboard
-   CSU palette + Apple-inspired clean design
+   main.css — My Pet Well-being
+   CSU palette, pale matte light green variant, mobile-first
    ============================================================
 
-   CSU Color Palette:
-   --csu-green:        #1E4D2B  (primary brand green)
-   --csu-gold:         #C8A951  (accent gold)
-   --csu-light-green:  #2D6A3F  (hover / secondary green)
-   --csu-cream:        #F5F0E8  (warm off-white background)
-   --csu-dark:         #1A1A1A  (near-black text)
+   Color tokens:
+   --csu-green          #1E4D2B   brand green (header, buttons)
+   --csu-gold           #C8A951   accent gold
+   --pale-green         #A8D5B5   hero gradient / chips
+   --pale-green-deep    #6FAF88   hero gradient deep end
+   --pale-green-soft    #D4EDD9   tint backgrounds
+   --csu-cream          #F2F0EC   app background
    ============================================================ */
 
 :root {
-  --csu-green:        #1E4D2B;
-  --csu-green-hover:  #2D6A3F;
-  --csu-green-light:  #E8F0EA;
-  --csu-gold:         #C8A951;
-  --csu-gold-light:   #F5EDD0;
-  --csu-cream:        #F7F5F0;
-  --csu-dark:         #1A1A1A;
-  --csu-mid:          #4A5568;
-  --csu-border:       #E2E8E4;
+  --csu-green:          #1E4D2B;
+  --csu-green-hover:    #2D6A3F;
+  --csu-green-light:    #E8F0EA;
+  --csu-gold:           #C8A951;
+  --csu-gold-light:     #F5EDD0;
+  --csu-cream:          #F2F0EC;
+  --csu-dark:           #1A1A1A;
+  --csu-mid:            #5A6472;
+  --csu-border:         #E0DDD8;
 
-  --font-system: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Helvetica, Arial, sans-serif;
+  /* Pale matte green — the new accent replacing dark green in UI fills */
+  --pale-green:         #A8D5B5;
+  --pale-green-deep:    #6FAF88;
+  --pale-green-soft:    #D4EDD9;
+  --hero-grad-a:        #BDDFC9;  /* hero card gradient start */
+  --hero-grad-b:        #72AF8E;  /* hero card gradient end   */
+
+  --font-main:   'Quicksand', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-system: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
   --radius-sm:   8px;
-  --radius-md:   12px;
-  --radius-lg:   16px;
-  --shadow-sm:   0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-  --shadow-md:   0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+  --radius-md:   14px;
+  --radius-lg:   20px;
+  --radius-xl:   26px;
+  --shadow-sm:   0 1px 4px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md:   0 4px 16px rgba(0,0,0,0.10), 0 2px 4px rgba(0,0,0,0.05);
+  --shadow-hero: 0 8px 32px rgba(107,175,136,0.28);
   --transition:  0.18s ease;
+
+  --header-h:    56px;
+  --nav-h:       68px;
 }
 
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+/* ── Reset ───────────────────────────────────────────────── */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 html {
-   scroll-behavior: smooth;
+  scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-section {
-  display: grid;
-  place-items: center;
-  align-content: center;
-  min-height: 25vh;
-  margin: 0;
-  padding: 20px 0;
-}
-
 body {
-  font-family: var(--font-system);
+  font-family: var(--font-main);
   font-size: 14px;
   line-height: 1.5;
   color: var(--csu-dark);
+  background: #D8D6D2;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+a { color: var(--csu-gold); text-decoration: none; }
+a:hover { color: var(--csu-green); }
+
+/* ── App Shell ───────────────────────────────────────────── */
+
+.app-shell {
+  width: 100%;
+  max-width: 480px;
+  min-height: 100vh;
   background: var(--csu-cream);
-  height: 100vh;
   display: flex;
   flex-direction: column;
+  position: relative;
+  box-shadow: 0 0 60px rgba(0,0,0,0.18);
 }
 
-/* ── Header ─────────────────────────────────────────────── */
-
-header {
-  background: var(--csu-green);
-  color: #fff;
-  padding: 0 24px;
-  height: 56px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  box-shadow: 0 1px 0 rgba(0,0,0,0.12);
-  flex-shrink: 0;
+@media (min-width: 481px) {
+  .app-shell {
+    margin: 0 auto;
+    min-height: 100vh;
+  }
 }
 
-header h1 {
-  font-size: 17px;
-  font-weight: 600;
-  letter-spacing: -0.2px;
-  color: #fff;
-}
+/* ── App Header ──────────────────────────────────────────── */
 
-/* Gold accent bar under header */
-header::after {
-  content: '';
-  position: absolute;
-  top: 56px;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: var(--csu-gold);
-}
-
-/* ── Main layout ─────────────────────────────────────────── */
-
-main {
-  display: flex;
-  flex: 1;
-  overflow: hidden;
-  margin-top: 2px; /* gold bar offset */
-}
-
-/* ── Patient list sidebar ────────────────────────────────── */
-
-#patient-list {
-  width: 280px;
-  flex-shrink: 0;
-  background: #fff;
-  border-right: 1px solid var(--csu-border);
-  overflow-y: auto;
-  padding: 16px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-#patient-list p {
-  color: var(--csu-mid);
-  font-size: 13px;
-  padding: 12px;
-  text-align: center;
-}
-
-/* Patient list items (for future use) */
-.patient-item {
-  padding: 10px 12px;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: background var(--transition), color var(--transition);
-  border: 1px solid transparent;
-}
-
-.patient-item:hover {
-  background: var(--csu-green-light);
-  border-color: var(--csu-border);
-}
-
-.patient-item.active {
-  background: var(--csu-green);
-  color: #fff;
-  border-color: var(--csu-green);
-}
-
-.patient-item .patient-name {
-  font-weight: 600;
-  font-size: 14px;
-}
-
-.patient-item .patient-meta {
-  font-size: 12px;
-  color: var(--csu-mid);
-  margin-top: 2px;
-}
-
-.patient-item.active .patient-meta {
-  color: rgba(255,255,255,0.75);
-}
-
-/* ── Patient detail panel ────────────────────────────────── */
-
-#patient-detail {
-  flex: 1;
-  overflow-y: auto;
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-#patient-detail > p {
-  color: var(--csu-mid);
-  font-size: 14px;
-  margin: auto;
-  text-align: center;
-}
-
-/* ── Cards ───────────────────────────────────────────────── */
-
-.card {
-  background: #fff;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--csu-border);
-  box-shadow: var(--shadow-sm);
-  overflow: hidden;
-}
-
-.card-header {
-  padding: 14px 18px;
+.app-header {
+  height: var(--header-h);
+  background: var(--csu-cream);
   border-bottom: 1px solid var(--csu-border);
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 0 14px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 200;
 }
 
-.card-header h2 {
-  font-size: 14px;
-  font-weight: 600;
+.app-header::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0; right: 0;
+  height: 2px;
+  background: var(--csu-gold);
+}
+
+.app-header__title {
+  font-size: 16px;
+  font-weight: 800;
   color: var(--csu-dark);
-  letter-spacing: -0.1px;
+  letter-spacing: -0.3px;
+  flex: 1;
+  text-align: center;
 }
 
-.card-body {
-  padding: 16px 18px;
+.header-avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2.5px solid var(--pale-green);
+  background: var(--pale-green-soft);
+  display: block;
 }
 
-/* ── Badges ──────────────────────────────────────────────── */
-
-.badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 2px 8px;
-  border-radius: 100px;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.2px;
-}
-
-.badge-green {
-  background: var(--csu-green-light);
-  color: var(--csu-green);
-}
-
-.badge-gold {
-  background: var(--csu-gold-light);
-  color: #7A5C00;
-}
-
-/* ── Buttons ─────────────────────────────────────────────── */
-
-button {
-  background: transparent;
-  position: relative;
-  padding: 5px 15px;
+.app-header__avatar-btn,
+.app-header__settings {
+  width: 40px; height: 40px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  border-radius: 50%;
+  overflow: hidden;
   display: flex;
   align-items: center;
-  font-size: 17px;
-  font-weight: 600;
-  cursor: pointer;
-  border: 1px solid var(--csu-gold);
-  border-radius: 50px;
-  transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-  color: var(--csu-gold);
-  overflow: hidden;
+  justify-content: center;
+  transition: background var(--transition);
+  color: var(--csu-mid);
+  flex-shrink: 0;
 }
 
-button span {
-  margin: 10px;
+.app-header__settings svg { width: 20px; height: 20px; }
+
+.app-header__avatar-btn:hover,
+.app-header__settings:hover {
+  background: var(--pale-green-soft);
+  color: var(--csu-green);
+  border: none;
+}
+.app-header__avatar-btn:hover::before,
+.app-header__settings:hover::before { display: none; }
+
+/* ── Pet Selector Chips ──────────────────────────────────── */
+
+.pet-selector {
+  padding: 8px 14px;
+  background: var(--csu-cream);
+  border-bottom: 1px solid var(--csu-border);
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  flex-shrink: 0;
+  -webkit-overflow-scrolling: touch;
+}
+
+.pet-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 14px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1.5px solid var(--csu-border);
+  background: #fff;
+  color: var(--csu-mid);
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all var(--transition);
+  font-family: var(--font-main);
+}
+
+.pet-chip.active,
+.pet-chip:hover {
+  background: var(--pale-green-soft);
+  border-color: var(--pale-green-deep);
+  color: var(--csu-green);
+}
+.pet-chip:hover::before { display: none; }
+
+/* ── Screens ─────────────────────────────────────────────── */
+
+.screens-container {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+.app-screen {
+  display: none;
+  height: calc(100vh - var(--header-h) - var(--nav-h));
+  overflow-y: auto;
+  padding: 16px 14px calc(var(--nav-h) + 20px);
+  -webkit-overflow-scrolling: touch;
+}
+
+.app-screen.active { display: block; }
+
+/* ── Hero Card ───────────────────────────────────────────── */
+
+.hero-card {
+  border-radius: var(--radius-xl);
+  background: linear-gradient(150deg, var(--hero-grad-a) 0%, var(--hero-grad-b) 100%);
+  position: relative;
+  overflow: hidden;
+  min-height: 268px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow-hero);
+}
+
+.hero-body-img {
+  width: 196px;
+  height: 196px;
+  object-fit: contain;
+  margin-top: 10px;
   position: relative;
   z-index: 1;
+  border-radius: 26px;
+  filter: drop-shadow(0 6px 12px rgba(0,0,0,0.14));
+  transition: src var(--transition);
 }
 
-button::before {
+.hero-flowers {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  margin: auto;
-  content: "";
-  border-radius: 50px;
-  display: block;
-  width: 5em;
-  outline: none;
-  overflow: hidden;
-  background: var(--csu-green);
-  transform: scale(0);
-  transition: transform 0.3s ease-out;
-  z-index: -1;
+  bottom: 68px;
+  left: 0; right: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 18px;
+  pointer-events: none;
+  z-index: 0;
 }
 
-button:hover {
-  background: var(--csu-green);
+.hero-flower { font-size: 30px; opacity: 0.82; }
+
+.hero-info {
+  width: 100%;
+  text-align: center;
+  padding: 8px 16px 18px;
   color: #fff;
+  position: relative;
+  z-index: 2;
+}
+
+.hero-name {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  text-shadow: 0 1px 6px rgba(0,0,0,0.18);
+  margin-bottom: 2px;
+}
+
+.hero-meta {
+  font-size: 14px;
+  font-weight: 600;
+  opacity: 0.88;
+}
+
+.hero-pts {
+  font-size: 13px;
+  font-weight: 500;
+  opacity: 0.78;
+  margin-top: 1px;
+}
+
+/* ── Quick Actions ───────────────────────────────────────── */
+
+.quick-actions-row {
+  display: flex;
+  justify-content: space-around;
+  gap: 6px;
+  margin-bottom: 20px;
+}
+
+.qa-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  flex: 1;
+  transition: transform var(--transition);
+  font-family: var(--font-main);
+}
+
+.qa-btn:hover { transform: translateY(-3px); background: none; border: none; color: inherit; }
+.qa-btn:active { transform: scale(0.93); }
+.qa-btn:hover::before { display: none; }
+
+.qa-icon {
+  width: 54px; height: 54px;
+  border-radius: 50%;
+  background: var(--qa-color, #eee);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--transition);
+}
+
+.qa-btn:hover .qa-icon { box-shadow: var(--shadow-md); }
+
+.qa-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--csu-mid);
+  text-align: center;
+}
+
+/* ── Section Title ───────────────────────────────────────── */
+
+.section-title {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--csu-dark);
+  letter-spacing: -0.3px;
+  margin-bottom: 10px;
+}
+
+/* ── Goals List ──────────────────────────────────────────── */
+
+.goals-list {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin-bottom: 14px;
+}
+
+.goal-item {
+  background: #fff;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--csu-border);
+  box-shadow: var(--shadow-sm);
+  padding: 13px 14px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  cursor: pointer;
+  transition: background var(--transition), border-color var(--transition), box-shadow var(--transition);
+}
+
+.goal-item:hover { box-shadow: var(--shadow-md); }
+
+.goal-item.completed {
+  background: var(--pale-green-soft);
+  border-color: var(--pale-green);
+}
+
+.goal-checkbox {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 22px; height: 22px;
+  border: 2px solid var(--csu-border);
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  flex-shrink: 0;
+  background: #fff;
+  transition: all var(--transition);
+}
+
+.goal-checkbox:checked {
+  background: var(--csu-green);
   border-color: var(--csu-green);
 }
 
-button:active {
-  transform: scale(0.98);
+.goal-checkbox:checked::after {
+  content: '';
+  position: absolute;
+  top: 3px; left: 6px;
+  width: 5px; height: 9px;
+  border: 2.5px solid #fff;
+  border-top: none;
+  border-left: none;
+  transform: rotate(45deg);
 }
 
-button:hover::before {
-  box-shadow: inset 0 0 0 50em var(--csu-green);
-  transform: scale(1);
-}
-
-
-.btn {
-  display: inline-flex;
+.goal-icon-wrap {
+  width: 42px; height: 42px;
+  border-radius: 11px;
+  display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
-  border-radius: var(--radius-sm);
-  font-family: var(--font-system);
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  border: none;
-  transition: background var(--transition), box-shadow var(--transition), transform var(--transition);
+  justify-content: center;
+  font-size: 21px;
+  flex-shrink: 0;
 }
 
-.btn-primary {
+.goal-name {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--csu-dark);
+}
+
+.goal-item.completed .goal-name {
+  text-decoration: line-through;
+  color: var(--csu-mid);
+  font-weight: 600;
+}
+
+.goal-pts {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--csu-gold);
+  white-space: nowrap;
+}
+
+.goals-placeholder {
+  color: var(--csu-mid);
+  font-size: 13px;
+  padding: 16px;
+  text-align: center;
+}
+
+/* ── Wellness Screen ─────────────────────────────────────── */
+
+.wellbeing-hero-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: -24px;
+  position: relative;
+  z-index: 2;
+}
+
+.wb-body-img {
+  width: 120px; height: 120px;
+  object-fit: contain;
+  border-radius: 26px;
+  filter: drop-shadow(0 4px 10px rgba(0,0,0,0.13));
+}
+
+.wellbeing-card {
+  background: #fff;
+  border-radius: var(--radius-lg);
+  border: 1.5px solid var(--csu-border);
+  box-shadow: var(--shadow-sm);
+  padding: 20px 16px 16px;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: visible;
+}
+
+.wb-face-corner {
+  position: absolute;
+  top: -14px;
+  right: -6px;
+  width: 62px; height: 62px;
+  object-fit: contain;
+  border-radius: 50%;
+  border: 2.5px solid var(--csu-border);
+  background: var(--pale-green-soft);
+  box-shadow: var(--shadow-sm);
+}
+
+.wb-label {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--csu-dark);
+  margin-bottom: 10px;
+  margin-top: 8px;
+}
+
+.wb-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.wb-track {
+  flex: 1;
+  height: 14px;
+  border-radius: 100px;
+  background: linear-gradient(to right, #C4A8E0, #F19070, #F5C842, var(--pale-green-deep));
+  position: relative;
+  overflow: hidden;
+}
+
+/* White mask that slides from right to reveal the gradient */
+.wb-track::after {
+  content: '';
+  position: absolute;
+  top: 0; right: 0; bottom: 0;
+  background: #ece8e3;
+  border-radius: 100px;
+  transition: width 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  width: var(--wb-mask, 100%);
+}
+
+.wb-pct {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--csu-dark);
+  min-width: 46px;
+  text-align: right;
+}
+
+/* ── Achievement Card ────────────────────────────────────── */
+
+.achievement-card {
+  background: linear-gradient(130deg, #F7F0D8 0%, #EDE0B4 100%);
+  border: 1.5px solid #E0CC90;
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-sm);
+}
+
+.achievement-icon { font-size: 30px; flex-shrink: 0; }
+
+.achievement-text p {
+  font-size: 13px;
+  font-weight: 700;
+  color: #7A5C00;
+  line-height: 1.45;
+}
+
+.achievement-sub {
+  font-weight: 500 !important;
+  opacity: 0.82;
+  margin-top: 2px;
+}
+
+/* ── Badge Shelf ─────────────────────────────────────────── */
+
+.badge-shelf {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  margin-bottom: 16px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.badge-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.badge-icon-circle {
+  width: 58px; height: 58px;
+  border-radius: 50%;
+  background: var(--pale-green-soft);
+  border: 2px solid var(--pale-green);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.badge-item--earned .badge-icon-circle {
+  background: linear-gradient(135deg, var(--csu-gold-light), #EDD070);
+  border-color: var(--csu-gold);
+  box-shadow: 0 2px 8px rgba(200, 169, 81, 0.3);
+}
+
+.badge-item--locked .badge-icon-circle {
+  filter: grayscale(1);
+  opacity: 0.38;
+}
+
+.badge-item:hover .badge-icon-circle { transform: scale(1.1); box-shadow: var(--shadow-md); }
+.badge-item--locked:hover .badge-icon-circle { transform: none; box-shadow: none; }
+
+.badge-name {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--csu-mid);
+  text-align: center;
+  max-width: 64px;
+  line-height: 1.2;
+}
+
+/* ── Visit Timeline ──────────────────────────────────────── */
+
+.visit-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  position: relative;
+  padding-left: 32px;
+}
+
+.visit-timeline::before {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 10px; bottom: 10px;
+  width: 2px;
+  background: var(--pale-green);
+  border-radius: 1px;
+}
+
+.visit-entry {
+  position: relative;
+  padding-bottom: 14px;
+}
+
+.visit-entry::before {
+  content: '';
+  position: absolute;
+  left: -26px;
+  top: 10px;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: var(--pale-green-deep);
+  border: 2.5px solid #fff;
+  box-shadow: 0 0 0 2px var(--pale-green-deep);
+  z-index: 1;
+}
+
+.visit-card {
+  background: #fff;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--csu-border);
+  padding: 12px 14px;
+  box-shadow: var(--shadow-sm);
+}
+
+.visit-date {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--pale-green-deep);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 3px;
+}
+
+.visit-reason {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--csu-dark);
+  margin-bottom: 3px;
+}
+
+.visit-vet {
+  font-size: 12px;
+  color: var(--csu-mid);
+  font-weight: 500;
+}
+
+.visit-notes {
+  font-size: 12px;
+  color: var(--csu-mid);
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--csu-border);
+  line-height: 1.55;
+}
+
+/* ── Profile Screen ──────────────────────────────────────── */
+
+.profile-actions {
+  margin-top: 20px;
+  margin-bottom: 8px;
+}
+
+.profile-register-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 13px 20px;
+  border-radius: var(--radius-md);
+  font-size: 15px;
+  font-weight: 800;
+  width: 100%;
+  text-align: center;
+  text-decoration: none;
+  color: #fff !important;
+  background: var(--pale-green-deep);
+  box-shadow: var(--shadow-sm);
+  transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+  font-family: var(--font-main);
+}
+
+.profile-register-btn:hover {
   background: var(--csu-green);
   color: #fff;
-  box-shadow: var(--shadow-sm);
-}
-
-.btn-primary:hover {
-  background: var(--csu-green-hover);
   box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
 }
 
-.btn-secondary {
+/* ── Patient list (profile tab) ──────────────────────────── */
+
+#patient-list .patient-item {
   background: #fff;
-  color: var(--csu-green);
-  border: 1px solid var(--csu-border);
-  box-shadow: var(--shadow-sm);
-}
-
-.btn-secondary:hover {
-  background: var(--csu-green-light);
-}
-
-.btn-gold {
-  background: var(--csu-gold);
-  color: #fff;
-  box-shadow: var(--shadow-sm);
-}
-
-.btn-gold:hover {
-  background: #B5963D;
-  box-shadow: var(--shadow-md);
-}
-
-/* ── Scrollbars ──────────────────────────────────────────── */
-
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.25); }
-
-/* ── Footer ──────────────────────────────────────────────── */
-
-footer {
-  background: #fff;
-  border-top: 1px solid var(--csu-border);
-  height: 40px;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--csu-border);
+  padding: 12px 14px;
+  cursor: pointer;
   display: flex;
   align-items: center;
-  padding: 0 24px;
-  font-size: 12px;
-  color: var(--csu-mid);
-  flex-shrink: 0;
-  text-align: center;
-  font-weight: lighter;
+  gap: 12px;
+  margin-bottom: 9px;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition);
 }
 
-* ── Animations ──────────────────────────────────────────── */
-
-.hidden {
-  opacity: 0;
-  transition: all 1.5s;
+#patient-list .patient-item:hover,
+#patient-list .patient-item.active {
+  border-color: var(--pale-green);
+  background: var(--pale-green-soft);
 }
 
-.hiddentwo {
-  opacity: 0;
-  transform: translateY(50px);
-}
-
-.show {
-  opacity: 1;
-}
-
-@keyframes slide-in-from-bottom {
-  0%   { opacity: 0; transform: translateY(50px); }
-  100% { opacity: 1; transform: translateY(0); }
-}
-
-.showtwo {
-  opacity: 1;
-  transform: translateY(0);
-  animation: slide-in-from-bottom 2.5s ease-out forwards;
-}
-
-.autoShow {
-  animation: autoShowAnimation both;
-  animation-timeline: view(70% 5%);
-}
-
-@keyframes autoShowAnimation {
-  from { opacity: 0; transform: translateY(200px) scale(0.3); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-.autoBlur {
-  animation: autoBlurAnimation linear both;
-  animation-timeline: view();
-}
-
-@keyframes autoBlurAnimation {
-  0%        { filter: blur(40px); }
-  45%, 55%  { filter: blur(0px); }
-  100%      { filter: blur(40px); }
-}
-
-a {
-  color: var(--csu-gold);
-  text-decoration: none;
-}
-
-a:hover {
-  color: var(--csu-cream);
-}
-
-form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    margin: 20px auto;
-    width: fit-content;
-}
-
-h1, h2 {
-    text-align: center;
-}
-
-/* ============================================================
-   TODO: Loading overlay + shimmer animation
-   ============================================================
-   - #loading-overlay: full-screen fixed overlay, semi-transparent cream bg
-   - .fact-card: centered white card with soft shadow, fact text + "Did you know" label
-   - Fade-out transition on dismiss (opacity 0 → pointer-events none)
-   - @keyframes shimmer: sweeping highlight left → right (135deg gradient)
-   ============================================================ */
-
-/* ============================================================
-   TODO: Skeleton / shimmer placeholder styles
-   ============================================================
-   - .skeleton: base class — light gray bg, border-radius matching card shapes
-   - .skeleton-text: slim horizontal bar (~14px tall) for text lines
-   - .skeleton-card: full card-height placeholder block
-   - .skeleton-content: wrapper that stacks skeleton items in the detail panel layout
-   - Apply .shimmer class to animate — uses shimmer keyframes above
-   ============================================================ */
-
-/* ============================================================
-   TODO: Risk flag chip styles
-   ============================================================
-   - .risk-chip: pill shape, small font, icon + label + × button
-   - .risk-chip--red:   background tint of red, red text — for aggression / bite flags
-   - .risk-chip--amber: background tint of amber, amber text — for anxiety flags
-   - .risk-chip .remove-btn: × button, subtle, visible on hover
-   - #risk-flags: flex-wrap row, gap between chips, margin-bottom before next section
-   ============================================================ */
-
-/* ── Mood widget ─────────────────────────────────────────── */
-
-.mood-widget {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-left: auto;
-}
-
-.mood-face {
-  width: 40px;
-  height: 40px;
+.patient-item-avatar {
+  width: 46px; height: 46px;
   border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid var(--csu-border);
+  background: var(--pale-green-soft);
+  border: 2px solid var(--pale-green);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
 }
 
-.mood-label {
+#patient-list .patient-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--csu-dark);
+}
+
+#patient-list .patient-meta {
   font-size: 12px;
-  font-weight: 500;
   color: var(--csu-mid);
+  font-weight: 500;
+  margin-top: 1px;
 }
 
-/* ── Patient info fields ─────────────────────────────────── */
+/* ── Patient info card ───────────────────────────────────── */
 
 .patient-fields {
   display: grid;
@@ -489,247 +770,377 @@ h1, h2 {
   font-size: 13px;
 }
 
-.patient-fields dt {
-  color: var(--csu-mid);
-  font-weight: 500;
+.patient-fields dt { color: var(--csu-mid); font-weight: 600; }
+.patient-fields dd { color: var(--csu-dark); font-weight: 500; }
+
+.mood-widget { display: flex; align-items: center; gap: 7px; }
+.mood-face { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid var(--csu-border); }
+.mood-label { font-size: 12px; font-weight: 600; color: var(--csu-mid); }
+
+/* ── Cards ───────────────────────────────────────────────── */
+
+.card {
+  background: #fff;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--csu-border);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  margin-bottom: 12px;
 }
 
-.patient-fields dd {
+.card-header {
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--csu-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-header h2 {
+  font-size: 14px;
+  font-weight: 800;
   color: var(--csu-dark);
 }
 
-/* ── Vaccine status badges ───────────────────────────────── */
+.card-body { padding: 14px 16px; }
 
-.badge-overdue  { background: #FDECEA; color: #C0392B; }
+/* ── Status Badges ───────────────────────────────────────── */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+.badge-green   { background: var(--pale-green-soft); color: var(--csu-green); }
+.badge-gold    { background: var(--csu-gold-light); color: #7A5C00; }
+.badge-overdue { background: #FDECEA; color: #C0392B; }
 .badge-due-soon { background: #FEF0E6; color: #D35400; }
 .badge-upcoming { background: var(--csu-gold-light); color: #7A5C00; }
-.badge-current  { background: var(--csu-green-light); color: var(--csu-green); }
+.badge-current  { background: var(--pale-green-soft); color: var(--csu-green); }
 
-.vaccine-dot {
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  display: inline-block;
-  flex-shrink: 0;
-}
+.vaccine-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
 .vaccine-dot--red    { background: #C0392B; }
 .vaccine-dot--orange { background: #D35400; }
 .vaccine-dot--gold   { background: var(--csu-gold); }
 .vaccine-dot--green  { background: var(--csu-green); }
 
-/* ── Vaccine card internals ──────────────────────────────── */
+/* ── Buttons ─────────────────────────────────────────────── */
 
-.vaccine-list {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.vaccine-row {
+button {
+  background: transparent;
+  position: relative;
+  padding: 6px 16px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
+  font-family: var(--font-main);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1.5px solid var(--csu-gold);
+  border-radius: 50px;
+  transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+  color: var(--csu-gold);
+  overflow: hidden;
 }
 
-.vaccine-name {
-  font-weight: 600;
-  font-size: 13px;
+button:hover {
+  background: var(--csu-green);
+  color: #fff;
+  border-color: var(--csu-green);
 }
 
-.vaccine-nickname {
-  color: var(--csu-mid);
-  font-weight: 400;
+button:active { transform: scale(0.97); }
+button:hover::before { display: none; }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 18px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-main);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: background var(--transition), box-shadow var(--transition), transform var(--transition);
 }
 
-.vaccine-dates {
+.btn:active { transform: scale(0.97); }
+.btn:hover::before { display: none; }
+
+.btn-primary { background: var(--csu-green); color: #fff; box-shadow: var(--shadow-sm); }
+.btn-primary:hover { background: var(--csu-green-hover); box-shadow: var(--shadow-md); color: #fff; border: none; }
+
+.btn-secondary {
+  background: #fff;
+  color: var(--csu-green);
+  border: 1.5px solid var(--csu-border) !important;
+  box-shadow: var(--shadow-sm);
+}
+.btn-secondary:hover { background: var(--pale-green-soft); color: var(--csu-green); border-color: var(--pale-green) !important; }
+
+.btn-gold { background: var(--csu-gold); color: #fff; box-shadow: var(--shadow-sm); }
+.btn-gold:hover { background: #B5963D; box-shadow: var(--shadow-md); color: #fff; border: none; }
+
+/* ── Risk Flags ──────────────────────────────────────────── */
+
+#risk-flags { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.risk-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 100px;
   font-size: 12px;
-  color: var(--csu-mid);
-  margin-top: 2px;
+  font-weight: 700;
 }
 
-.vaccine-empty {
-  color: var(--csu-mid);
+.risk-chip--red   { background: #FDECEA; color: #C0392B; border: 1.5px solid #FECACA; }
+.risk-chip--amber { background: #FEF3E2; color: #B45309; border: 1.5px solid #FDE68A; }
+
+/* ── Notification banner ─────────────────────────────────── */
+
+.notif-banner {
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
   font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  animation: slide-down 0.3s ease;
 }
 
-/* ── Scan panel ──────────────────────────────────────────── */
+.notif-banner--info    { background: var(--pale-green-soft); color: var(--csu-green); border: 1.5px solid var(--pale-green); }
+.notif-banner--warning { background: var(--csu-gold-light); color: #7A5C00; border: 1.5px solid var(--csu-gold); }
+.notif-banner--urgent  { background: #FDECEA; color: #C0392B; border: 1.5px solid #FECACA; }
+
+@keyframes slide-down {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Vaccine styles ──────────────────────────────────────── */
+
+.vaccine-list   { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.vaccine-row    { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.vaccine-name   { font-weight: 700; font-size: 13px; }
+.vaccine-nickname { color: var(--csu-mid); font-weight: 500; }
+.vaccine-dates  { font-size: 12px; color: var(--csu-mid); margin-top: 2px; }
+.vaccine-empty  { color: var(--csu-mid); font-size: 13px; }
 
 .vaccine-scan-panel {
-  padding: 14px 18px;
+  padding: 14px 16px;
   border-top: 1px solid var(--csu-border);
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.scan-label {
-  font-size: 13px;
-  font-weight: 500;
-}
+.scan-label     { font-size: 13px; font-weight: 700; }
+.scan-file-input { font-size: 13px; }
+.scan-actions   { display: flex; gap: 8px; }
+.scan-status    { font-size: 12px; color: var(--csu-mid); min-height: 16px; }
+.scan-results   { font-size: 12px; }
 
-.scan-file-input {
-  font-size: 13px;
-}
-
-.scan-actions {
-  display: flex;
-  gap: 8px;
-}
-
-.scan-status {
-  font-size: 12px;
-  color: var(--csu-mid);
-  min-height: 16px;
-}
-
-.scan-results {
-  font-size: 12px;
-}
-
-.scan-results-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 6px;
-  font-size: 12px;
-}
-
+.scan-results-table { width: 100%; border-collapse: collapse; margin-top: 6px; font-size: 12px; }
 .scan-results-table th,
-.scan-results-table td {
-  text-align: left;
-  padding: 5px 8px;
-  border-bottom: 1px solid var(--csu-border);
+.scan-results-table td { text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--csu-border); }
+.scan-results-table th { font-weight: 700; color: var(--csu-green); background: var(--pale-green-soft); }
+.scan-results-table tr:last-child td { border-bottom: none; }
+.scan-raw-label { font-weight: 600; color: var(--csu-mid); margin-bottom: 4px; }
+.scan-raw-lines { padding-left: 16px; color: var(--csu-mid); line-height: 1.6; }
+.scan-no-records { color: var(--csu-mid); font-style: italic; }
+
+/* ── Bottom Navigation ───────────────────────────────────── */
+
+.bottom-nav {
+  height: var(--nav-h);
+  background: #fff;
+  border-top: 1px solid var(--csu-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 4px;
+  flex-shrink: 0;
+  box-shadow: 0 -4px 16px rgba(0,0,0,0.07);
+  position: sticky;
+  bottom: 0;
+  z-index: 200;
 }
 
-.scan-results-table th {
-  font-weight: 600;
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 8px 10px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: #9BA3AF;
+  font-size: 10px;
+  font-weight: 700;
+  flex: 1;
+  border-radius: var(--radius-sm);
+  transition: color var(--transition);
+  font-family: var(--font-main);
+  letter-spacing: 0.1px;
+}
+
+.nav-item svg {
+  width: 23px; height: 23px;
+  stroke-width: 1.8;
+  transition: stroke-width var(--transition);
+}
+
+.nav-item:hover,
+.nav-item.active {
   color: var(--csu-green);
-  background: var(--csu-green-light);
+  background: none;
+  border: none;
 }
 
-.scan-results-table tr:last-child td {
-  border-bottom: none;
+.nav-item.active svg { stroke-width: 2.4; }
+.nav-item:hover::before { display: none; }
+
+/* ── Loading Overlay ─────────────────────────────────────── */
+
+#loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(242, 240, 236, 0.94);
+  backdrop-filter: blur(6px);
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  transition: opacity 0.35s ease;
 }
 
-.scan-raw-label {
+#loading-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.fact-card {
+  background: #fff;
+  border-radius: var(--radius-lg);
+  border: 1.5px solid var(--csu-border);
+  box-shadow: var(--shadow-md);
+  padding: 26px 30px;
+  max-width: 310px;
+  text-align: center;
+}
+
+.fact-eyebrow {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--csu-gold);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+}
+
+.fact-text {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--csu-dark);
   font-weight: 500;
-  color: var(--csu-mid);
-  margin-bottom: 4px;
 }
 
-.scan-raw-lines {
-  padding-left: 16px;
-  color: var(--csu-mid);
-  line-height: 1.6;
+/* ── Skeleton / shimmer ──────────────────────────────────── */
+
+.skeleton-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 270px;
+  align-items: flex-start;
 }
 
-.scan-no-records {
-  color: var(--csu-mid);
-  font-style: italic;
+.skeleton {
+  border-radius: var(--radius-sm);
+  background: linear-gradient(90deg, #e4e0da 25%, #ece9e3 50%, #e4e0da 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
 }
 
-/* ============================================================
-   TODO: Notification bell + dropdown styles
-   ============================================================
-   - .notif-bell: button wrapper, position relative, no background
-   - .notif-badge: absolute positioned red circle with white count text
-     top-right of the bell icon; hidden when count is 0
-   - .notif-dropdown: absolute positioned card below bell, min-width 300px
-     shadow-md, hidden by default, shown on bell click
-   - .notif-row: each patient/vaccine row in dropdown — flex, hover bg
-   - .notif-dropdown--empty: muted "All vaccines up to date" message
-   ============================================================ */
+.skeleton-card { height: 110px; border-radius: var(--radius-md); width: 100%; }
+.skeleton-text { height: 13px; border-radius: 100px; }
 
-/* ============================================================
-   TODO: Telehealth flow styles
-   ============================================================
-   - Telehealth uses a warmer, softer palette: lean cream and gold over green
-   - .telehealth-modal / .telehealth-panel: overlay or side panel container
-   - .telehealth-step: each step wrapper with fade-in transition between steps
-   - .urgency-selector: radio-style pill buttons with friendly labels
-     low → green-tinted, medium → gold-tinted, high → orange-tinted, critical → red
-   - .consult-room: two-column layout (video placeholder | patient sidebar)
-   - .consult-video-placeholder: gray box, camera icon, soft border
-   - .post-consult-summary: warm card with vet name, notes, follow-up CTA
-   ============================================================ */
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
 
-/* ============================================================
-   TODO: Gamification progress bar + badge shelf styles
-   ============================================================
-   - .gamification-widget: card wrapper for the full progress section
-   - .progress-bar-track: full-width gray track, border-radius pill
-   - .progress-bar-fill: gold fill, width set via inline style (% of milestone)
-     transition: width 0.4s ease for animated fill on load
-   - .badge-shelf: flex row, gap, overflow-x auto for many badges
-   - .badge-item: 40×40px circle, icon centered
-     .badge-item--earned: full color
-     .badge-item--locked: grayscale + reduced opacity
-   - .milestone-label: small muted text below bar — "Next: Senior Wellness Champion"
-   ============================================================ */
+/* ── Empty state ─────────────────────────────────────────── */
 
-/* ============================================================
-   TODO: Emergency mode color overrides
-   ============================================================
-   - .emergency-mode: applied to #location-finder-modal when opened via header button
-   - Override accent colors: --emergency-red: #C0392B (or similar deep red)
-   - .emergency-mode .modal-header: red background instead of CSU green
-   - .emergency-mode .result-card--er: stronger red left border, elevated shadow
-   - .emergency-mode .phone-number: font-size 20px+, font-weight 700, tap-to-call
-   - .emergency-disclaimer: full-width red banner, white text, bold, top of modal
-   ============================================================ */
+.empty-state {
+  color: var(--csu-mid);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 16px 0;
+  text-align: center;
+}
 
-/* ============================================================
-   TODO: Location result card styles
-   ============================================================
-   - .result-card: white card, border-radius md, shadow-sm, padding 16px
-     left border 4px solid — red for ER, green for general clinic
-   - .result-card__name: bold, 15px
-   - .result-card__distance: muted, small — e.g. "1.2 mi"
-   - .result-card__address: standard body text
-   - .result-card__phone: tap-to-call <a href="tel:"> styling
-     Normal mode: standard link style
-     Emergency mode: large (20px+), bold, prominent
-   - .result-card__hours: colored by status:
-       "Open now" → green text
-       "Closes at Xpm" → gold/amber text
-       "24 Hours" → green text + badge
-       "Closed" → red text
-   - .result-card__directions: .btn-secondary style, "Get Directions" label
-   - .specialty-badge: small pill badge for specialist type (Oncology, etc.)
-     style similar to existing .badge but with a distinct outline variant
-   - .result-section-header: section label ("Emergency / 24-Hour Care",
-     "General Veterinary Clinics") — bold, slightly larger, with a divider line
-   ============================================================ */
+/* ── Form groups (used in register etc.) ─────────────────── */
 
-/* ============================================================
-   TODO: Map container styles
-   ============================================================
-   - #map-container: defined height (e.g. 300px desktop, 220px mobile)
-     border-radius md, overflow hidden, border 1px solid var(--csu-border)
-   - Mobile: hidden by default; shown when .map-visible class is applied
-     Toggle via "Show map" / "Hide map" button below filter bar
-   - Desktop: displayed alongside results list in a two-column layout
-   ============================================================ */
+.form-group { margin-bottom: 14px; }
 
-/* ============================================================
-   TODO: Filter bar styles
-   ============================================================
-   - #location-filter-bar: flex row, gap 8px, padding 12px 0, flex-wrap
-   - .filter-toggle: pill-shaped toggle button
-     inactive: white bg, border, muted text
-     active: CSU green bg, white text
-   - .filter-toggle--emergency: active state uses red instead of green
-   - .specialty-select: styled <select> matching dashboard input conventions
-   - Filter bar is hidden entirely in emergency mode (.emergency-mode)
-   ============================================================ */
+.form-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--csu-dark);
+  margin-bottom: 5px;
+}
 
-/* ============================================================
-   TODO: Mobile tap-to-call button styles
-   ============================================================
-   - .tap-to-call: <a href="tel:..."> styled as a button on mobile
-     min-height 44px (Apple HIG touch target), full width on mobile
-     Icon (phone handset) to the left of the number
-   - Normal mode: .btn-secondary style
-   - Emergency mode: prominent — dark red bg, white text, large font
-   - @media (min-width: 768px): revert to inline link style on desktop
-   ============================================================ */
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid var(--csu-border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-main);
+  font-size: 14px;
+  color: var(--csu-dark);
+  background: #fff;
+  outline: none;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: var(--pale-green-deep);
+  box-shadow: 0 0 0 3px rgba(111, 175, 136, 0.16);
+}
+
+/* ── Scrollbars ──────────────────────────────────────────── */
+
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 2px; }
+
+/* ── Legacy animation classes (kept for compatibility) ────── */
+
+.hidden-anim { opacity: 0; transition: all 1.5s; }
+.show        { opacity: 1; }
+
+@keyframes slide-in-from-bottom {
+  from { opacity: 0; transform: translateY(50px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

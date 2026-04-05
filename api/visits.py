@@ -15,10 +15,12 @@ def list_visits():
     docs = (
         db.collection("visits")
         .where("patient_id", "==", patient_id)
-        .order_by("visit_date")
         .stream()
     )
-    visits = [{"id": doc.id, **doc.to_dict()} for doc in docs]
+    visits = sorted(
+        [{"id": doc.id, **doc.to_dict()} for doc in docs],
+        key=lambda v: v.get("visit_date", ""),
+    )
     return jsonify(visits), 200
 
 
