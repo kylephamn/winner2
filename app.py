@@ -15,8 +15,8 @@ app.register_blueprint(patients_bp, url_prefix="/api/patients")
 # from api.notes import notes_bp
 # app.register_blueprint(notes_bp, url_prefix="/api/notes")
 
-# from api.vaccines import vaccines_bp
-# app.register_blueprint(vaccines_bp, url_prefix="/api/vaccines")
+ #from api.vaccines import vaccines_bp
+ #app.register_blueprint(vaccines_bp, url_prefix="/api/vaccines")
 
 # from api.visits import visits_bp
 # app.register_blueprint(visits_bp, url_prefix="/api/visits")
@@ -50,6 +50,14 @@ app.register_blueprint(patients_bp, url_prefix="/api/patients")
 def index():
     """Main entry point — renders the patient dashboard shell."""
     return render_template("index.html")
+
+@app.route("/register")
+def register():
+    return render_template("register.html")
+
+@app.route("/scan")
+def scan():
+    return render_template("scan.html")
 
 
 # ---------------------------------------------------------------------------

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register Your Pet</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
+</head>
+<body>
+    <header>
+        <button><a href="/">Home Page</a></button>
+    </header>>
+<h1> Register Pet</h1>>
+    <div>
+    <form id="patient-form">
+    <input type="text" id="name" placeholder="Name" /><br>
+    <input type="text" id="species" placeholder="Species" /><br>
+    <input type="text" id="breed" placeholder="Breed" /><br>
+    <input type="text" id="sex" placeholder="Sex" /><br>
+    <input type="date" id="dob" placeholder="Date of Birth" /><br>
+    <input type="checkbox" id="neutered"> Neutered<br>
+    <input type="text" id="insurance_id" placeholder="Insurance ID" /><br>
+    <input type="number" id="weight" placeholder="Weight" /><br>
+    <button type="button" onclick="createPatient()">Add Patient</button>
+    </form>
+    <pre id="result"></pre>
+
+    <script src="/static/patients.js"></script>
+    </div>
+    <h2>Or</h2>
+    <button>
+        <a href ='/scan'>Scan </a>
+    </button>
+</body>
+</html>

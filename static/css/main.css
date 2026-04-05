@@ -38,8 +38,18 @@
 }
 
 html {
+   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+section {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  min-height: 25vh;
+  margin: 0;
+  padding: 20px 0;
 }
 
 body {
@@ -221,6 +231,63 @@ main {
 
 /* ── Buttons ─────────────────────────────────────────────── */
 
+button {
+  background: transparent;
+  position: relative;
+  padding: 5px 15px;
+  display: flex;
+  align-items: center;
+  font-size: 17px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  border: 1px solid var(--csu-gold);
+  border-radius: 50px;
+  transition: all 0.3s ease-out;
+  text-align: center;
+  color: var(--csu-gold);
+}
+
+button span {
+  margin: 10px;
+  position: relative;
+  z-index: 1;
+}
+
+button::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  content: "";
+  border-radius: 50px;
+  display: block;
+  width: 5em;
+  outline: none;
+  overflow: hidden;
+  background: var(--csu-green);
+  transform: scale(0);
+  transition: transform 0.3s ease-out;
+  z-index: -1;
+}
+
+button:hover {
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0);
+  transition: 1s;
+}
+
+button:hover::before {
+  box-shadow: inset 0 0 0 50em var(--csu-green);
+  transform: scale(1);
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
 .btn {
   display: inline-flex;
   align-items: center;
@@ -233,10 +300,6 @@ main {
   cursor: pointer;
   border: none;
   transition: background var(--transition), box-shadow var(--transition), transform var(--transition);
-}
-
-.btn:active {
-  transform: scale(0.98);
 }
 
 .btn-primary {
@@ -272,24 +335,12 @@ main {
   box-shadow: var(--shadow-md);
 }
 
-/* ── Scrollbars (webkit) ─────────────────────────────────── */
+/* ── Scrollbars ──────────────────────────────────────────── */
 
-::-webkit-scrollbar {
-  width: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(0,0,0,0.15);
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(0,0,0,0.25);
-}
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.25); }
 
 /* ── Footer ──────────────────────────────────────────────── */
 
@@ -303,6 +354,56 @@ footer {
   font-size: 12px;
   color: var(--csu-mid);
   flex-shrink: 0;
+  text-align: center;
+  font-weight: lighter;
+}
+
+* ── Animations ──────────────────────────────────────────── */
+
+.hidden {
+  opacity: 0;
+  transition: all 1.5s;
+}
+
+.hiddentwo {
+  opacity: 0;
+  transform: translateY(50px);
+}
+
+.show {
+  opacity: 1;
+}
+
+@keyframes slide-in-from-bottom {
+  0%   { opacity: 0; transform: translateY(50px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.showtwo {
+  opacity: 1;
+  transform: translateY(0);
+  animation: slide-in-from-bottom 2.5s ease-out forwards;
+}
+
+.autoShow {
+  animation: autoShowAnimation both;
+  animation-timeline: view(70% 5%);
+}
+
+@keyframes autoShowAnimation {
+  from { opacity: 0; transform: translateY(200px) scale(0.3); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.autoBlur {
+  animation: autoBlurAnimation linear both;
+  animation-timeline: view();
+}
+
+@keyframes autoBlurAnimation {
+  0%        { filter: blur(40px); }
+  45%, 55%  { filter: blur(0px); }
+  100%      { filter: blur(40px); }
 }
 
 /* ============================================================
