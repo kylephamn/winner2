@@ -8,6 +8,7 @@ locations_bp = Blueprint("locations", __name__)
 GOOGLE_PLACES_KEY = os.environ.get("GOOGLE_PLACES_API_KEY")
 PLACES_NEARBY_URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
 PLACES_DETAIL_URL = "https://maps.googleapis.com/maps/api/place/details/json"
+GEOCODE_URL       = "https://maps.googleapis.com/maps/api/geocode/json"
 
 
 def _miles_to_meters(miles):
@@ -59,11 +60,9 @@ def _fetch_places(lat, lng, radius_meters, keyword=None):
     params = {
         "location": f"{lat},{lng}",
         "radius":   radius_meters,
-        "type":     "veterinary_care",
+        "keyword":  keyword or "pet vaccine clinic",
         "key":      GOOGLE_PLACES_KEY,
     }
-    if keyword:
-        params["keyword"] = keyword
 
     resp = requests.get(PLACES_NEARBY_URL, params=params, timeout=10)
     if resp.status_code != 200:
@@ -74,6 +73,29 @@ def _fetch_places(lat, lng, radius_meters, keyword=None):
         return None, f"Google Places error: {data.get('status')}"
 
     return data.get("results", []), None
+
+
+@locations_bp.route("/geocode", methods=["GET"])
+def geocode_zipcode():
+    zipcode = request.args.get("zipcode", "").strip()
+    if not zipcode:
+        return jsonify({"error": "zipcode query param is required"}), 400
+    if not GOOGLE_PLACES_KEY:
+        return jsonify({"error": "GOOGLE_PLACES_API_KEY environment variable is not set"}), 500
+
+    resp = requests.get(GEOCODE_URL, params={"address": zipcode, "key": GOOGLE_PLACES_KEY}, timeout=10)
+    if resp.status_code != 200:
+        return jsonify({"error": f"Geocoding API error: {resp.status_code}"}), 502
+
+    data = resp.json()
+    if data.get("status") == "ZERO_RESULTS" or not data.get("results"):
+        return jsonify({"error": "ZIP code not found"}), 404
+    if data.get("status") != "OK":
+        return jsonify({"error": f"Geocoding error: {data.get('status')}"}), 502
+
+    loc = data["results"][0]["geometry"]["location"]
+    formatted = data["results"][0].get("formatted_address", zipcode)
+    return jsonify({"lat": loc["lat"], "lng": loc["lng"], "formatted_address": formatted}), 200
 
 
 @locations_bp.route("/nearby", methods=["GET"])
@@ -91,12 +113,12 @@ def find_nearby_vets():
 
     radius_meters = _miles_to_meters(radius)
 
-    # Fetch all vets and emergency-keyword vets in parallel-ish
+    # Fetch vaccine clinics; also search for any 24-hour emergency vaccination sites
     all_places, err = _fetch_places(lat, lng, radius_meters)
     if err:
         return jsonify({"error": err}), 502
 
-    emergency_places, _ = _fetch_places(lat, lng, radius_meters, keyword="emergency 24 hour")
+    emergency_places, _ = _fetch_places(lat, lng, radius_meters, keyword="pet vaccine clinic emergency 24 hour")
 
     emergency_ids = {p["place_id"] for p in (emergency_places or [])}
 
@@ -129,7 +151,7 @@ def find_nearby_emergency():
     except (KeyError, ValueError):
         return jsonify({"error": "lat and lng query params are required and must be numbers"}), 400
 
-    places, err = _fetch_places(lat, lng, _miles_to_meters(25), keyword="emergency 24 hour")
+    places, err = _fetch_places(lat, lng, _miles_to_meters(25), keyword="pet vaccine clinic emergency 24 hour")
     if err:
         return jsonify({"error": err}), 502
 

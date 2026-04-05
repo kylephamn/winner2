@@ -78,7 +78,7 @@ baja_id = str(uuid.uuid4())
 baja = {
     "petID":               baja_id,
     "name":                "Baja Blast",
-    "species":             "Cat",
+    "species":             "cat",
     "breed":               "Orange",
     "sex":                 "Male",
     "dob":                 "2025-09-28",

@@ -2,6 +2,10 @@
 // gamification.js — daily goals, wellness score, badges, facts
 // ============================================================
 
+// ── Active pet species (set when a patient is loaded) ─────────
+let _activePetSpecies = '';
+function setActivePetSpecies(species) { _activePetSpecies = (species || '').toLowerCase(); }
+
 // ── Daily goals definition ────────────────────────────────────
 const DAILY_GOALS = [
   { id: 'breakfast', icon: '🍽️', label: 'Healthy Breakfast', pts: 50,  bg: '#F9D8A0' },
@@ -69,17 +73,18 @@ function updateWellbeingDisplay() {
   const pctEl = document.getElementById('wb-pct');
   if (pctEl) pctEl.textContent = pct + '%';
 
-  // Choose images based on wellness
+  // Choose images based on wellness and species
   let faceImg, bodyImg;
+  const isCat = _activePetSpecies === 'cat';
   if (pct >= 75) {
-    faceImg = '/images/face3.png';   // happy
-    bodyImg = '/images/body3.png';  // excited/wagging
+    faceImg = isCat ? '/images/cat_happy.png'   : '/images/face3.png';
+    bodyImg = isCat ? '/images/cat_body_happy.png'   : '/images/body3.png';
   } else if (pct >= 40) {
-    faceImg = '/images/face1.png';   // neutral
-    bodyImg = '/images/body3.png';
+    faceImg = isCat ? '/images/cat_neutral.png' : '/images/face1.png';
+    bodyImg = isCat ? '/images/cat_body_neutral.png' : '/images/body3.png';
   } else {
-    faceImg = '/images/sad_dog.png'; // saddest
-    bodyImg = '/images/body1.png';  // sad
+    faceImg = isCat ? '/images/cat_sad.png'     : '/images/sad_dog.png';
+    bodyImg = isCat ? '/images/cat_body_sad.png'     : '/images/body1.png';
   }
 
   const ids = ['wb-face', 'header-pet-face'];
