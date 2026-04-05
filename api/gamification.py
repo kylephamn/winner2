@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, request
+from db import db
 
 gamification_bp = Blueprint("gamification", __name__)
 
@@ -8,143 +9,224 @@ gamification_bp = Blueprint("gamification", __name__)
 # Points are awarded across ALL ages for any health event:
 #   - Completed vaccination, wellness visit, biometric/lab work, grooming appointment, etc.
 #
-# Older pets receive age-appropriate milestones that celebrate longevity
-# and consistent care (e.g. "Senior Wellness Champion", "10-Year Health Star").
-#
-# Badges and milestones are designed to be motivating for owners, not
-# prescriptive — the tone should be warm and celebratory.
-#
-# Rewards catalog (redeemable with points):
-#   - DISCOUNT_VISIT:    % off next hospital/clinic visit
-#   - DISCOUNT_MEDICINE: % off tick, flea, or heartworm medication
-#   - DISCOUNT_GROOMING: % off next grooming appointment
+# Points place users in a percentile ranking across all app users.
+# Badges and milestones celebrate consistent care in a warm, motivating tone.
 # ---------------------------------------------------------------------------
 
-# ---------------------------------------------------------------------------
-# Reward definitions
-# ---------------------------------------------------------------------------
-REWARDS = {
-    "DISCOUNT_VISIT": {
-        "id": "DISCOUNT_VISIT",
-        "name": "Discounted Hospital Visit",
-        "description": "Redeem for 20% off your pet's next clinic or hospital visit.",
-        "discount_percent": 20,
-        "points_cost": 500,
-        "category": "visit",
-    },
-    "DISCOUNT_MEDICINE": {
-        "id": "DISCOUNT_MEDICINE",
-        "name": "Discounted Tick & Flea / Heartworm Medicine",
-        "description": "Redeem for 15% off tick, flea, or heartworm preventative medication.",
-        "discount_percent": 15,
-        "points_cost": 300,
-        "category": "medicine",
-    },
-    "DISCOUNT_GROOMING": {
-        "id": "DISCOUNT_GROOMING",
-        "name": "Discounted Grooming Session",
-        "description": "Redeem for 25% off your pet's next grooming appointment.",
-        "discount_percent": 25,
-        "points_cost": 250,
-        "category": "grooming",
-    },
+BADGE_MILESTONES = [
+    {"id": "first_steps",       "name": "First Steps",       "description": "Awarded your first health points.",             "threshold": 100},
+    {"id": "health_starter",    "name": "Health Starter",    "description": "Keeping up with pet care — great start!",       "threshold": 300},
+    {"id": "wellness_champion", "name": "Wellness Champion", "description": "Consistently prioritizing your pet's health.",   "threshold": 500},
+    {"id": "dedicated_owner",   "name": "Dedicated Owner",   "description": "Top-tier commitment to your pet's wellbeing.",  "threshold": 1000},
+    {"id": "pet_health_hero",   "name": "Pet Health Hero",   "description": "An inspiration to pet owners everywhere.",      "threshold": 2000},
+]
+
+POINTS_PER_EVENT = {
+    "vaccination":    100,
+    "wellness_visit": 150,
+    "biometrics":      75,
+    "grooming":        50,
 }
+
+
+def _compute_percentile(user_points, all_points):
+    """Return the percentage of users scoring strictly below user_points (0–100)."""
+    if not all_points:
+        return 100.0
+    below = sum(1 for p in all_points if p < user_points)
+    return round(below / len(all_points) * 100, 1)
+
+
+def _unlocked_badges(points):
+    return [b for b in BADGE_MILESTONES if points >= b["threshold"]]
 
 
 @gamification_bp.route("/", methods=["GET"])
 def get_progress():
-    # TODO: return points total, earned badges, and next milestone for a patient
-    # Query param: patient_id
-    # Response shape:
-    # {
-    #   "patient_id": <int>,
-    #   "points": <int>,
-    #   "badges": [{ "id": str, "name": str, "earned_at": str }],
-    #   "next_milestone": { "name": str, "points_needed": int }
-    # }
-    pass
+    """Return points total, percentile rank, earned badges, and next milestone for a user.
+
+    Query param: user_id
+    """
+    user_id = request.args.get("user_id")
+    if not user_id:
+        return jsonify({"error": "user_id query param is required"}), 400
+
+    doc = db.collection("users").document(user_id).get()
+    if not doc.exists:
+        return jsonify({"error": "User not found"}), 404
+
+    gamification = doc.to_dict().get("gamification", {"points": 0, "badges": [], "redemptions": []})
+    points = gamification.get("points", 0)
+
+    # Compute percentile across all users
+    all_docs = db.collection("users").stream()
+    all_points = [
+        d.to_dict().get("gamification", {}).get("points", 0)
+        for d in all_docs
+    ]
+    percentile = _compute_percentile(points, all_points)
+
+    # Next milestone
+    next_milestone = next(
+        (b for b in BADGE_MILESTONES if points < b["threshold"]),
+        None,
+    )
+
+    return jsonify({
+        "user_id": user_id,
+        "points": points,
+        "percentile": percentile,
+        "badges": gamification.get("badges", []),
+        "next_milestone": (
+            {"name": next_milestone["name"], "points_needed": next_milestone["threshold"] - points}
+            if next_milestone else None
+        ),
+    }), 200
 
 
 @gamification_bp.route("/award", methods=["POST"])
 def award_points():
-    # TODO: award points for a health event; check for newly unlocked badges
-    # Request body:
-    # {
-    #   "patient_id": <int>,
-    #   "event_type": str,   # e.g. "vaccination", "wellness_visit", "biometrics", "grooming"
-    #   "event_id": <int>    # reference to the source record
-    # }
-    # Response: updated points total + any newly unlocked badges
-    pass
+    """Award points for a health event and check for newly unlocked badges.
+
+    Request body:
+    {
+      "user_id":    str,
+      "event_type": str,   # "vaccination" | "wellness_visit" | "biometrics" | "grooming"
+      "event_id":   str
+    }
+    """
+    data = request.get_json(silent=True) or {}
+    user_id = data.get("user_id")
+    event_type = data.get("event_type")
+    event_id = data.get("event_id")
+
+    if not user_id or not event_type or not event_id:
+        return jsonify({"error": "user_id, event_type, and event_id are required"}), 400
+
+    points_to_award = POINTS_PER_EVENT.get(event_type)
+    if points_to_award is None:
+        return jsonify({"error": f"Unknown event_type '{event_type}'"}), 400
+
+    doc_ref = db.collection("users").document(user_id)
+    doc = doc_ref.get()
+    if not doc.exists:
+        return jsonify({"error": "User not found"}), 404
+
+    gamification = doc.to_dict().get("gamification", {"points": 0, "badges": [], "redemptions": []})
+    previous_points = gamification.get("points", 0)
+    new_points = previous_points + points_to_award
+
+    existing_badge_ids = {b["id"] for b in gamification.get("badges", [])}
+    new_badges = [
+        b for b in _unlocked_badges(new_points)
+        if b["id"] not in existing_badge_ids
+    ]
+    updated_badges = gamification.get("badges", []) + [
+        {"id": b["id"], "name": b["name"], "earned_at": b.get("earned_at", "")}
+        for b in new_badges
+    ]
+
+    doc_ref.update({
+        "gamification.points": new_points,
+        "gamification.badges": updated_badges,
+    })
+
+    return jsonify({
+        "points": new_points,
+        "points_awarded": points_to_award,
+        "new_badges": new_badges,
+    }), 200
 
 
 @gamification_bp.route("/badges", methods=["GET"])
 def list_badges():
-    # TODO: return all available badges with earned/locked status for a patient
-    # Query param: patient_id
-    # Response: list of badges with { id, name, description, earned, earned_at }
-    pass
+    """Return all badges with earned/locked status for a user.
+
+    Query param: user_id
+    """
+    user_id = request.args.get("user_id")
+    if not user_id:
+        return jsonify({"error": "user_id query param is required"}), 400
+
+    doc = db.collection("users").document(user_id).get()
+    if not doc.exists:
+        return jsonify({"error": "User not found"}), 404
+
+    gamification = doc.to_dict().get("gamification", {"points": 0, "badges": []})
+    earned = {b["id"]: b for b in gamification.get("badges", [])}
+
+    badges = []
+    for b in BADGE_MILESTONES:
+        entry = {
+            "id":          b["id"],
+            "name":        b["name"],
+            "description": b["description"],
+            "earned":      b["id"] in earned,
+            "earned_at":   earned[b["id"]].get("earned_at") if b["id"] in earned else None,
+        }
+        badges.append(entry)
+
+    return jsonify({"badges": badges}), 200
 
 
 @gamification_bp.route("/milestones", methods=["GET"])
 def list_milestones():
-    # TODO: return age-appropriate milestones for a patient
-    # Query param: patient_id
-    # Milestones are selected based on the patient's age (senior pets get longevity milestones)
-    # Response: list of milestones with { name, description, points_required, completed }
-    pass
+    """Return all milestones with completion status for a user.
+
+    Query param: user_id
+    """
+    user_id = request.args.get("user_id")
+    if not user_id:
+        return jsonify({"error": "user_id query param is required"}), 400
+
+    doc = db.collection("users").document(user_id).get()
+    if not doc.exists:
+        return jsonify({"error": "User not found"}), 404
+
+    points = doc.to_dict().get("gamification", {}).get("points", 0)
+
+    milestones = [
+        {
+            "name":            b["name"],
+            "description":     b["description"],
+            "points_required": b["threshold"],
+            "completed":       points >= b["threshold"],
+        }
+        for b in BADGE_MILESTONES
+    ]
+    return jsonify({"milestones": milestones}), 200
 
 
-# ---------------------------------------------------------------------------
-# Rewards / Redemption
-# ---------------------------------------------------------------------------
+@gamification_bp.route("/leaderboard", methods=["GET"])
+def leaderboard():
+    """Return all users ranked by points with their percentile.
 
-@gamification_bp.route("/rewards", methods=["GET"])
-def list_rewards():
-    """Return the full rewards catalog with point costs and discount details."""
-    return jsonify({"rewards": list(REWARDS.values())}), 200
+    Query params:
+      limit (int, default 50) — number of top users to return
+    """
+    try:
+        limit = int(request.args.get("limit", 50))
+    except ValueError:
+        return jsonify({"error": "limit must be an integer"}), 400
 
+    docs = list(db.collection("users").stream())
+    all_points = [d.to_dict().get("gamification", {}).get("points", 0) for d in docs]
 
-@gamification_bp.route("/redeem", methods=["POST"])
-def redeem_reward():
-    # TODO: redeem a reward for a patient
-    # Request body:
-    # {
-    #   "patient_id": <int>,
-    #   "reward_id": str    # one of: "DISCOUNT_VISIT", "DISCOUNT_MEDICINE", "DISCOUNT_GROOMING"
-    # }
-    # Logic:
-    #   1. Look up patient's current points balance in Firestore
-    #   2. Validate reward_id exists in REWARDS catalog
-    #   3. Check patient has enough points (balance >= reward["points_cost"])
-    #   4. Deduct points and write a redemption record to Firestore:
-    #      {
-    #        "patient_id": ...,
-    #        "reward_id": ...,
-    #        "discount_percent": ...,
-    #        "category": ...,          # "visit" | "medicine" | "grooming"
-    #        "redeemed_at": <timestamp>,
-    #        "used": false             # flipped to true when the discount is applied
-    #      }
-    #   5. Return the redemption record + updated points balance
-    # Errors: 400 if invalid reward_id, 402 if insufficient points, 404 if patient not found
-    pass
+    ranked = sorted(
+        [
+            {
+                "user_id":    d.id,
+                "first_name": d.to_dict().get("first_name", ""),
+                "last_name":  d.to_dict().get("last_name", ""),
+                "points":     d.to_dict().get("gamification", {}).get("points", 0),
+            }
+            for d in docs
+        ],
+        key=lambda x: x["points"],
+        reverse=True,
+    )
 
+    for entry in ranked:
+        entry["percentile"] = _compute_percentile(entry["points"], all_points)
 
-@gamification_bp.route("/redemptions", methods=["GET"])
-def list_redemptions():
-    # TODO: return all active (unused) redemptions for a patient
-    # Query param: patient_id
-    # Optionally filter by category: ?category=visit|medicine|grooming
-    # Response: list of redemption records ordered by redeemed_at desc
-    pass
-
-
-@gamification_bp.route("/redemptions/<redemption_id>/use", methods=["POST"])
-def use_redemption(redemption_id):
-    _ = redemption_id  # used once TODO is implemented
-    # TODO: mark a redemption as used when the discount is applied at checkout
-    # Sets used=true and used_at=<timestamp> on the redemption record in Firestore
-    # Returns the updated redemption record
-    # Error: 409 if already used, 404 if not found
-    pass
+    return jsonify({"leaderboard": ranked[:limit]}), 200
