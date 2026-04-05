@@ -19,19 +19,59 @@
 async function readVaccinePaper() {
     const fileInput = document.getElementById("vaccine-image");
     const file = fileInput.files[0];
+    if (!file) {
+        alert("Please select an image file first.");
+        return;
+    }
+
+    const statusEl = document.getElementById("scan-status");
+    const resultsEl = document.getElementById("scan-results");
+    if (statusEl) statusEl.textContent = "Scanning…";
+    if (resultsEl) resultsEl.innerHTML = "";
 
     const reader = new FileReader();
     reader.onload = async () => {
         const base64 = reader.result.split(",")[1];  // strip the data:image/... prefix
 
-        const response = await fetch("http://localhost:5000/api/vaccines/", {
-            method: "GET",  // consider POST for sending data
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ image: base64 })
-        });
+        try {
+            const response = await fetch("/api/vaccines/scan", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ image: base64 })
+            });
 
-        const data = await response.json();
-        console.log(data);
+            const data = await response.json();
+
+            if (!response.ok) {
+                if (statusEl) statusEl.textContent = "Error: " + (data.error || response.statusText);
+                return;
+            }
+
+            const records = data.records || [];
+            const raw = data.lines || [];
+
+            if (records.length > 0) {
+                if (statusEl) statusEl.textContent = `Parsed ${records.length} vaccine record(s):`;
+                if (resultsEl) {
+                    records.forEach(r => {
+                        const p = document.createElement("p");
+                        p.textContent = `${r.administered_date}  |  ${r.nickname}  |  ${r.name}`;
+                        resultsEl.appendChild(p);
+                    });
+                }
+            } else {
+                if (statusEl) statusEl.textContent = `No structured records found. Raw OCR (${raw.length} line(s)):`;
+                if (resultsEl) {
+                    raw.forEach(line => {
+                        const p = document.createElement("p");
+                        p.textContent = line;
+                        resultsEl.appendChild(p);
+                    });
+                }
+            }
+        } catch (err) {
+            if (statusEl) statusEl.textContent = "Request failed: " + err.message;
+        }
     };
     reader.readAsDataURL(file);
 }
