@@ -3,7 +3,7 @@
 // ============================================================
 
 async function createPatient() {
-    const response = await fetch("http://localhost:5000/api/patients/", {
+    const response = await fetch("/api/patients/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -18,7 +18,13 @@ async function createPatient() {
         })
     });
 
+    if (!response.ok) {
+        console.error("Error:", response.status, await response.text());
+        return;
+    }
+
     const data = await response.json();
+    console.log("Created:", data);
     document.getElementById("result").textContent = JSON.stringify(data, null, 2);
 }
 
