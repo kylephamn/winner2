@@ -321,7 +321,6 @@ a:hover { color: var(--csu-green); }
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 26px;
   box-shadow: var(--shadow-sm);
   transition: box-shadow var(--transition);
 }
@@ -409,7 +408,6 @@ a:hover { color: var(--csu-green); }
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 21px;
   flex-shrink: 0;
 }
 
@@ -578,7 +576,6 @@ a:hover { color: var(--csu-green); }
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
   transition: transform var(--transition), box-shadow var(--transition);
 }
 
@@ -1488,6 +1485,22 @@ button:hover::before { display: none; }
 }
 
 .loc-directions-btn:hover {
+  border-color: var(--csu-green);
+  color: var(--csu-green);
+}
+
+.loc-website-link {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--csu-mid);
+  border: 1.5px solid var(--csu-border);
+  border-radius: 6px;
+  padding: 4px 10px;
+  text-decoration: none;
+  transition: border-color var(--transition), color var(--transition);
+}
+
+.loc-website-link:hover {
   border-color: var(--csu-green);
   color: var(--csu-green);
 }
