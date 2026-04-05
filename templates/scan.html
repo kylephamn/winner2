@@ -1,16 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Scan</title>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Scan Vaccine Record</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
 </head>
 <body>
     <section id="vaccine-loader">
-      <input type="file" id="vaccine-image" accept="image/*">
-      <button onclick="readVaccinePaper()">Read Vaccine Paper</button>
+        <h2>Scan Vaccine Paper Record</h2>
+        <input type="file" id="vaccine-image" accept="image/*" />
+        <button onclick="readVaccinePaper()">Read Vaccine Paper</button>
+        <p id="scan-status"></p>
+        <div id="scan-results"></div>
     </section>
+    <script src="{{ url_for('static', filename='js/vaccines.js') }}"></script>
 </body>
 </html>

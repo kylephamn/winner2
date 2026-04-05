@@ -1,7 +1,8 @@
 import uuid
 import base64
 import io
-from datetime import date
+import re
+from datetime import date, datetime
 
 import easyocr
 import numpy as np
@@ -57,6 +58,62 @@ def _reminder_bucket(due_date_str):
 # OCR — scan a paper vaccine record
 # ---------------------------------------------------------------------------
 
+_DATE_FORMATS = [
+    "%m/%d/%Y", "%m-%d-%Y", "%Y-%m-%d",
+    "%m/%d/%y", "%m-%d-%y",
+    "%d/%m/%Y", "%d-%m-%Y",
+]
+
+
+def _try_parse_date(token):
+    """Return ISO date string if token matches a known date format, else None."""
+    for fmt in _DATE_FORMATS:
+        try:
+            return datetime.strptime(token.strip(), fmt).date().isoformat()
+        except ValueError:
+            continue
+    return None
+
+
+def put_scans_into_format(results):
+    """
+    Parse OCR lines of the form: <date> <nickname> <procedure name>
+    (comma-separated or whitespace-separated).
+    Lines that don't start with a recognizable date are dropped.
+    Returns a list of dicts: {administered_date, nickname, name}
+    """
+    structured = []
+    for line in results:
+        line = line.strip()
+        if not line:
+            continue
+
+        # Prefer comma-separated; fall back to whitespace
+        if "," in line:
+            parts = [p.strip() for p in line.split(",", 2)]
+        else:
+            parts = re.split(r"\s+", line, maxsplit=2)
+
+        if len(parts) < 3:
+            continue
+
+        date_iso = _try_parse_date(parts[0])
+        if date_iso is None:
+            continue  # not a date-led line — drop it
+
+        nickname = parts[1].strip()
+        name = parts[2].strip()
+        if not nickname or not name:
+            continue
+
+        structured.append({
+            "administered_date": date_iso,
+            "nickname": nickname,
+            "name": name,
+        })
+    return structured
+
+
 @vaccines_bp.route("/scan", methods=["POST"])
 def read_vaccines_paper():
     """Accept a base64-encoded image and return OCR-extracted text lines."""
@@ -72,9 +129,10 @@ def read_vaccines_paper():
         return jsonify({"error": f"Invalid image data: {e}"}), 400
 
     reader = _get_ocr_reader()
-    results = reader.readtext(image_np, detail=0)  # detail=0 → plain text list
+    raw_lines = reader.readtext(image_np, detail=0)  # detail=0 → plain text list
+    structured = put_scans_into_format(raw_lines)
 
-    return jsonify({"lines": results})
+    return jsonify({"records": structured, "lines": raw_lines})
 
 
 # ---------------------------------------------------------------------------
