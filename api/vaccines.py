@@ -58,18 +58,10 @@ def _reminder_bucket(due_date_str):
 # OCR — scan a paper vaccine record
 # ---------------------------------------------------------------------------
 
-_DATE_FORMATS = [
-    "%m/%d/%Y", "%m-%d-%Y", "%Y-%m-%d",
-    "%m/%d/%y", "%m-%d-%y",
-    "%d/%m/%Y", "%d-%m-%Y",
-]
-
-
-def _try_parse_date(token):
-    """Return ISO date string if token matches a known date format, else None."""
-    for fmt in _DATE_FORMATS:
+def _try_parse_date(s):
+    for fmt in ("%b %d, %Y", "%m/%d/%Y", "%Y-%m-%d"):
         try:
-            return datetime.strptime(token.strip(), fmt).date().isoformat()
+            return datetime.strptime(s.strip(), fmt).date().isoformat()
         except ValueError:
             continue
     return None
@@ -77,40 +69,30 @@ def _try_parse_date(token):
 
 def put_scans_into_format(results):
     """
-    Parse OCR lines of the form: <date> <nickname> <procedure name>
-    (comma-separated or whitespace-separated).
-    Lines that don't start with a recognizable date are dropped.
-    Returns a list of dicts: {administered_date, nickname, name}
+    Parse OCR results from vet reminder tables.
+    Expects dates, nicknames, and full names as separate lines (3 lines per record).
+    Returns list of dicts: {administered_date, nickname, name}
     """
+    # Find where reminders start
+    try:
+        start = next(i for i, line in enumerate(results) if "REMINDERS" in line)
+    except StopIteration:
+        return []
+
+    lines = [l.strip() for l in results[start + 1:] if l.strip()]
+
     structured = []
-    for line in results:
-        line = line.strip()
-        if not line:
-            continue
-
-        # Prefer comma-separated; fall back to whitespace
-        if "," in line:
-            parts = [p.strip() for p in line.split(",", 2)]
-        else:
-            parts = re.split(r"\s+", line, maxsplit=2)
-
-        if len(parts) < 3:
-            continue
-
-        date_iso = _try_parse_date(parts[0])
+    # Each record is 3 consecutive lines: date, nickname, full name
+    for i in range(0, len(lines) - 2, 3):
+        date_iso = _try_parse_date(lines[i])
         if date_iso is None:
-            continue  # not a date-led line — drop it
-
-        nickname = parts[1].strip()
-        name = parts[2].strip()
-        if not nickname or not name:
-            continue
-
+            break  # past the reminders section
         structured.append({
             "administered_date": date_iso,
-            "nickname": nickname,
-            "name": name,
+            "nickname": lines[i + 1],
+            "name": lines[i + 2],
         })
+
     return structured
 
 
@@ -127,12 +109,56 @@ def read_vaccines_paper():
         image_np = np.array(image)
     except Exception as e:
         return jsonify({"error": f"Invalid image data: {e}"}), 400
-
     reader = _get_ocr_reader()
     raw_lines = reader.readtext(image_np, detail=0)  # detail=0 → plain text list
     structured = put_scans_into_format(raw_lines)
 
     return jsonify({"records": structured, "lines": raw_lines})
+
+
+@vaccines_bp.route("/scan/save", methods=["POST"])
+def scan_and_save_vaccines():
+    """OCR a vaccine record image and persist each parsed entry to Firebase."""
+    data = request.get_json()
+    if not data or "image" not in data:
+        return jsonify({"error": "image field (base64) is required"}), 400
+
+    patient_id = data.get("patient_id")
+    if not patient_id:
+        return jsonify({"error": "patient_id is required"}), 400
+
+    try:
+        image_bytes = base64.b64decode(data["image"])
+        image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
+        image_np = np.array(image)
+    except Exception as e:
+        return jsonify({"error": f"Invalid image data: {e}"}), 400
+
+    reader = _get_ocr_reader()
+    raw_lines = reader.readtext(image_np, detail=0)
+    structured = put_scans_into_format(raw_lines)
+
+    if not structured:
+        return jsonify({"error": "No vaccine records found in image", "lines": raw_lines}), 422
+
+    saved = []
+    for entry in structured:
+        vaccine_id = str(uuid.uuid4())
+        record = {
+            "patient_id": patient_id,
+            "name": entry["name"],
+            "nickname": entry.get("nickname"),
+            "administered_date": entry.get("administered_date"),
+            "due_date": None,
+            "administered_by": None,
+            "lot_number": None,
+        }
+        db.collection("vaccines").document(vaccine_id).set(record)
+        record["id"] = vaccine_id
+        record["reminder_bucket"] = _reminder_bucket(record.get("due_date"))
+        saved.append(record)
+
+    return jsonify({"saved": saved, "count": len(saved)}), 201
 
 
 # ---------------------------------------------------------------------------

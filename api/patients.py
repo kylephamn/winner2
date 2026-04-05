@@ -4,6 +4,7 @@ from firebase_admin import credentials, firestore
 from flask import Blueprint, jsonify, request
 from api.schemas import new_pet
 from db import db
+from datetime import date
 
 patients_bp = Blueprint("patients", __name__)
 
@@ -63,3 +64,27 @@ def update_patient(patient_id):
 def delete_patient(patient_id):
     db.collection("pets").document(patient_id).delete()
     return jsonify({"deleted": patient_id})
+
+def mood_score(doc):
+    dob = doc.get("dob")  # assumes dob is a string like "2018-03-15"
+    if not dob:
+        return None
+
+    age = (date.today() - date.fromisoformat(dob)).days // 365
+
+    if age < 5:
+        return "/images/face1.png"
+    elif age <= 10:
+        return "/images/face2.png"
+    else:
+        return "/images/face3.png"
+
+
+@patients_bp.route("/<patient_id>", methods=["POST"])
+def calculate_patients_mood(patient_id):
+    doc = db.collection("pets").document(patient_id).get()
+    if not doc.exists:
+        return jsonify({"error": "Not found"}), 404
+
+    data = doc.to_dict()
+    return jsonify({"id": doc.id, "mood_image": mood_score(data), **data})

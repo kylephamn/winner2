@@ -52,45 +52,104 @@ async function delete_patient() {
 }
 
 // ------------------------------------------------------------
-// TODO: Fetch patient list on page load
-//   - GET /api/patients/
-//   - Call showLoading() before fetch, hideLoading() after
-//   - On success, call renderPatientList(patients)
-//   - On error, call renderError(msg)
+// Patient list — load on page load
 // ------------------------------------------------------------
 
-// ------------------------------------------------------------
-// TODO: Render sidebar patient cards
-//   - For each patient, create a .patient-item element
-//   - Include a risk flag icon if patient has any active risk_tags
-//   - Include a vaccine status dot (colored per worst bucket: red > orange > gold)
-//   - Attach mouseenter handler → prefetchOnHover(patient.id)
-//   - Attach click handler → loadPatientDetail(patient.id)
-// ------------------------------------------------------------
+async function loadPatients() {
+  const listEl = document.getElementById("patient-list");
+  try {
+    const res = await fetch("/api/patients/");
+    if (!res.ok) throw new Error(res.statusText);
+    const patients = await res.json();
+    renderPatientList(patients);
+  } catch (err) {
+    if (listEl) listEl.innerHTML = `<p style="color:#c0392b;padding:16px;font-size:13px;">Failed to load patients.</p>`;
+  }
+}
+
+function renderPatientList(patients) {
+  const listEl = document.getElementById("patient-list");
+  if (!listEl) return;
+  listEl.innerHTML = "";
+
+  if (patients.length === 0) {
+    listEl.innerHTML = `<p style="padding:16px;font-size:13px;color:var(--csu-mid);">No patients on file.</p>`;
+    return;
+  }
+
+  patients.forEach(patient => {
+    const item = document.createElement("div");
+    item.className = "patient-item";
+    item.innerHTML = `
+      <div class="patient-name">${patient.name || "Unknown"}</div>
+      <div class="patient-meta">${[patient.species, patient.breed].filter(Boolean).join(" · ")}</div>
+    `;
+    item.onclick = () => loadPatientDetail(patient.id);
+    listEl.appendChild(item);
+  });
+}
 
 // ------------------------------------------------------------
-// TODO: Fetch and render patient detail panel
-//   function loadPatientDetail(patientId)
-//   - On click, read from cache first: getCachedPatient(patientId)
-//   - If cache hit (not expired), render immediately from cache
-//   - If cache miss or TTL expired, fetch GET /api/patients/<id>
-//     then write result to cache before rendering
-//   - Call each section renderer: renderRiskFlags, renderBasicInfo,
-//     renderMedsAllergies, renderVaccineCard, renderVitals,
-//     renderVisitTimeline, renderLabsGrooming, renderGamification
+// Patient detail — fetch mood + info, render panel
 // ------------------------------------------------------------
 
-// ------------------------------------------------------------
-// TODO: Prefetch on hover
-//   - On mouseenter of a patient card, fire GET /api/patients/<id>
-//     in the background (do not await in the UI thread)
-//   - Write result to the patient cache keyed by patient ID
-//   - This is handled via ui.js prefetchOnHover(patientId)
-// ------------------------------------------------------------
+async function loadPatientDetail(patientId) {
+  const infoEl = document.getElementById("patient-info");
+  if (infoEl) infoEl.innerHTML = `<p style="color:var(--csu-mid);font-size:13px;padding:16px;">Loading…</p>`;
 
-// ------------------------------------------------------------
-// TODO: Cache invalidation on write
-//   - After any POST/PUT/DELETE that modifies a patient record,
-//     call invalidateCache(patientId) from ui.js
-//   - Then re-fetch fresh data and re-render the detail panel
-// ------------------------------------------------------------
+  try {
+    // POST to calculate_patients_mood — returns patient data + mood_image
+    const res = await fetch(`/api/patients/${patientId}`, { method: "POST" });
+    if (!res.ok) throw new Error(res.statusText);
+    const patient = await res.json();
+    renderPatientInfo(patient);
+    if (typeof loadVaccineCard === "function") loadVaccineCard(patientId);
+  } catch (err) {
+    if (infoEl) infoEl.innerHTML = `<p style="color:#c0392b;font-size:13px;padding:16px;">Failed to load patient.</p>`;
+  }
+}
+
+function renderPatientInfo(patient) {
+  const infoEl = document.getElementById("patient-info");
+  if (!infoEl) return;
+
+  const moodLabel = {
+    "/images/face1.png": "Doing great",
+    "/images/face2.png": "Doing well",
+    "/images/face3.png": "Needs extra care",
+  };
+
+  const moodHTML = patient.mood_image
+    ? `<div class="mood-widget">
+         <img src="${patient.mood_image}" alt="Mood" class="mood-face" />
+         <span class="mood-label">${moodLabel[patient.mood_image] || "Unknown"}</span>
+       </div>`
+    : "";
+
+  const fields = [
+    ["Species",  patient.species],
+    ["Breed",    patient.breed],
+    ["Sex",      patient.sex],
+    ["DOB",      patient.dob],
+    ["Weight",   patient.weight ? `${patient.weight} lbs` : null],
+    ["Neutered", patient.neutered != null ? (patient.neutered ? "Yes" : "No") : null],
+  ].filter(([, v]) => v != null);
+
+  infoEl.innerHTML = `
+    <div class="card">
+      <div class="card-header">
+        <h2>${patient.name || "Patient"}</h2>
+        ${moodHTML}
+      </div>
+      <div class="card-body">
+        <dl class="patient-fields">
+          ${fields.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("")}
+        </dl>
+      </div>
+    </div>`;
+}
+
+// Kick off patient list on page load
+if (document.getElementById("patient-list")) {
+  loadPatients();
+}

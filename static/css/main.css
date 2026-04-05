@@ -457,17 +457,176 @@ h1, h2 {
    - #risk-flags: flex-wrap row, gap between chips, margin-bottom before next section
    ============================================================ */
 
-/* ============================================================
-   TODO: Vaccine status badge styles
-   ============================================================
-   - Extend existing .badge with status variants:
-   - .badge-overdue:   red background + text (danger — past due)
-   - .badge-due-soon:  orange background + text (warning — within 7 days)
-   - .badge-upcoming:  gold background + text (notice — within 30 days)
-   - .badge-current:   green (existing .badge-green) — more than 30 days out
-   - .vaccine-dot: tiny 8px circle used in sidebar patient cards
-     .vaccine-dot--red / --orange / --gold / --green
-   ============================================================ */
+/* ── Mood widget ─────────────────────────────────────────── */
+
+.mood-widget {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.mood-face {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--csu-border);
+}
+
+.mood-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--csu-mid);
+}
+
+/* ── Patient info fields ─────────────────────────────────── */
+
+.patient-fields {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 16px;
+  font-size: 13px;
+}
+
+.patient-fields dt {
+  color: var(--csu-mid);
+  font-weight: 500;
+}
+
+.patient-fields dd {
+  color: var(--csu-dark);
+}
+
+/* ── Vaccine status badges ───────────────────────────────── */
+
+.badge-overdue  { background: #FDECEA; color: #C0392B; }
+.badge-due-soon { background: #FEF0E6; color: #D35400; }
+.badge-upcoming { background: var(--csu-gold-light); color: #7A5C00; }
+.badge-current  { background: var(--csu-green-light); color: var(--csu-green); }
+
+.vaccine-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+.vaccine-dot--red    { background: #C0392B; }
+.vaccine-dot--orange { background: #D35400; }
+.vaccine-dot--gold   { background: var(--csu-gold); }
+.vaccine-dot--green  { background: var(--csu-green); }
+
+/* ── Vaccine card internals ──────────────────────────────── */
+
+.vaccine-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.vaccine-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.vaccine-name {
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.vaccine-nickname {
+  color: var(--csu-mid);
+  font-weight: 400;
+}
+
+.vaccine-dates {
+  font-size: 12px;
+  color: var(--csu-mid);
+  margin-top: 2px;
+}
+
+.vaccine-empty {
+  color: var(--csu-mid);
+  font-size: 13px;
+}
+
+/* ── Scan panel ──────────────────────────────────────────── */
+
+.vaccine-scan-panel {
+  padding: 14px 18px;
+  border-top: 1px solid var(--csu-border);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.scan-label {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.scan-file-input {
+  font-size: 13px;
+}
+
+.scan-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.scan-status {
+  font-size: 12px;
+  color: var(--csu-mid);
+  min-height: 16px;
+}
+
+.scan-results {
+  font-size: 12px;
+}
+
+.scan-results-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 6px;
+  font-size: 12px;
+}
+
+.scan-results-table th,
+.scan-results-table td {
+  text-align: left;
+  padding: 5px 8px;
+  border-bottom: 1px solid var(--csu-border);
+}
+
+.scan-results-table th {
+  font-weight: 600;
+  color: var(--csu-green);
+  background: var(--csu-green-light);
+}
+
+.scan-results-table tr:last-child td {
+  border-bottom: none;
+}
+
+.scan-raw-label {
+  font-weight: 500;
+  color: var(--csu-mid);
+  margin-bottom: 4px;
+}
+
+.scan-raw-lines {
+  padding-left: 16px;
+  color: var(--csu-mid);
+  line-height: 1.6;
+}
+
+.scan-no-records {
+  color: var(--csu-mid);
+  font-style: italic;
+}
 
 /* ============================================================
    TODO: Notification bell + dropdown styles
