@@ -239,13 +239,12 @@ button {
   align-items: center;
   font-size: 17px;
   font-weight: 600;
-  text-decoration: none;
   cursor: pointer;
   border: 1px solid var(--csu-gold);
   border-radius: 50px;
-  transition: all 0.3s ease-out;
-  text-align: center;
+  transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
   color: var(--csu-gold);
+  overflow: hidden;
 }
 
 button span {
@@ -274,9 +273,13 @@ button::before {
 }
 
 button:hover {
+  background: var(--csu-green);
   color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0);
-  transition: 1s;
+  border-color: var(--csu-green);
+}
+
+button:active {
+  transform: scale(0.98);
 }
 
 button:hover::before {
@@ -284,9 +287,6 @@ button:hover::before {
   transform: scale(1);
 }
 
-button:active {
-  transform: scale(0.98);
-}
 
 .btn {
   display: inline-flex;
@@ -404,6 +404,28 @@ footer {
   0%        { filter: blur(40px); }
   45%, 55%  { filter: blur(0px); }
   100%      { filter: blur(40px); }
+}
+
+a {
+  color: var(--csu-gold);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--csu-cream);
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin: 20px auto;
+    width: fit-content;
+}
+
+h1, h2 {
+    text-align: center;
 }
 
 /* ============================================================

@@ -61,6 +61,5 @@ def update_patient(patient_id):
 
 @patients_bp.route("/<patient_id>", methods=["DELETE"])
 def delete_patient(patient_id):
-    # TODO: soft-delete or hard-delete patient record
-    db.collection('Pet').document(patient_id).delete()
-    return "", 204
+    db.collection("pets").document(patient_id).delete()
+    return jsonify({"deleted": patient_id})
